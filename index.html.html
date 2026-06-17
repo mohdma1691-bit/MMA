@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مجلس الدعيلج — حجز الاستراحة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0d1b2a; --navy-700:#13243a; --navy-500:#213a5a;
+  --gold:#c9a227; --gold-soft:#e6cd7a;
+  --paper:#f6f3ec; --surface:#ffffff; --ink:#15202e; --muted:#566270; --line:#e8e5dc;
+  --green:#1f9d57; --green-bg:#e9f6ef; --green-line:#bfe6cf;
+  --amber:#dd8a1e; --amber-bg:#fdf3e3; --amber-line:#f1d3a0; --amber-ink:#955d11;
+  --red:#c0392b; --red-bg:#fbeceb; --red-line:#f0c5c0;
+  --past:#b4bcc6; --past-bg:#f1f2f4;
+  --shadow:0 8px 30px rgba(13,27,42,.10); --shadow-sm:0 2px 10px rgba(13,27,42,.06);
+  --r:14px; --r-sm:10px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Cairo','Segoe UI',Tahoma,sans-serif;background:var(--paper);color:var(--ink);line-height:1.65;-webkit-font-smoothing:antialiased;font-size:18px;overflow-x:hidden}
+
+header{background:linear-gradient(155deg,#0b1825 0%,var(--navy-700) 55%,var(--navy-500) 135%);color:#fff;padding:30px 20px 28px;position:relative;overflow:hidden;border-bottom:3px solid var(--gold);box-shadow:inset 0 -9px 0 -6px rgba(201,162,39,.30)}
+header::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.45;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='46' height='46' viewBox='0 0 46 46'%3E%3Cg fill='none' stroke='%23c9a227' stroke-width='1'%3E%3Crect x='11' y='11' width='24' height='24'/%3E%3Crect x='11' y='11' width='24' height='24' transform='rotate(45 23 23)'/%3E%3C/g%3E%3C/svg%3E");background-size:46px 46px}
+header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-gradient(circle at 88% -25%,rgba(201,162,39,.28),transparent 46%),radial-gradient(circle at 4% 125%,rgba(201,162,39,.12),transparent 42%);pointer-events:none}
+.head-inner{max-width:1180px;margin:auto;position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:18px}
+.brand{display:flex;align-items:center;gap:18px}
+.crest{position:relative;width:62px;height:62px;flex:none;border-radius:18px;background:linear-gradient(145deg,#efd886,var(--gold) 55%,#a8821a);display:grid;place-items:center;box-shadow:0 9px 24px rgba(201,162,39,.42),inset 0 0 0 1px rgba(255,255,255,.28)}
+.crest svg{width:31px;height:31px;position:relative;z-index:1}
+.crest-ring{position:absolute;inset:5px;border:1.5px solid rgba(13,27,42,.4);border-radius:14px}
+.brand-text h1{margin:0;font-size:34px;font-weight:900;letter-spacing:-.5px;text-shadow:0 2px 14px rgba(0,0,0,.35)}
+.brand-flourish{display:flex;align-items:center;gap:11px;margin-top:6px}
+.brand-flourish .fl{height:2px;width:30px;border-radius:2px;background:linear-gradient(90deg,transparent,rgba(230,205,122,.85))}
+.brand-flourish .fl:last-child{background:linear-gradient(90deg,rgba(230,205,122,.85),transparent)}
+.brand-flourish p{margin:0;font-size:15.5px;color:var(--gold-soft);font-weight:700;white-space:nowrap;letter-spacing:.3px}
+
+.date-card{display:flex;align-items:center;gap:14px;background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.045));border:1px solid rgba(201,162,39,.5);border-radius:16px;padding:12px 18px;backdrop-filter:blur(7px);box-shadow:0 8px 24px rgba(0,0,0,.22),inset 0 0 0 1px rgba(255,255,255,.05)}
+.date-card .dc-icon{width:44px;height:44px;border-radius:13px;background:linear-gradient(145deg,#efd886,var(--gold) 60%,#a8821a);display:grid;place-items:center;flex:none;box-shadow:0 5px 14px rgba(201,162,39,.4),inset 0 0 0 1px rgba(255,255,255,.25)}
+.date-card .dc-icon svg{width:23px;height:23px}
+.dc-lbl{font-size:12.5px;color:var(--gold-soft);font-weight:800;letter-spacing:.5px}
+.dc-main{font-size:20px;font-weight:800;color:#fff;margin-top:2px;line-height:1.2;text-shadow:0 1px 8px rgba(0,0,0,.3)}
+.dc-sub{font-size:13.5px;color:#d2dae3;margin-top:3px;font-weight:600}
+
+.admin-ic{position:absolute;top:16px;left:16px;z-index:3;width:44px;height:44px;border-radius:13px;background:rgba(255,255,255,.08);border:1px solid rgba(201,162,39,.45);color:var(--gold-soft);display:grid;place-items:center;cursor:pointer;transition:.18s;backdrop-filter:blur(5px)}
+.admin-ic:hover{background:var(--gold);color:var(--navy);border-color:var(--gold);transform:translateY(-1px)}
+.admin-ic svg{width:21px;height:21px}
+.admin-ic.is-admin{background:var(--gold);color:var(--navy);border-color:var(--gold);box-shadow:0 4px 14px rgba(201,162,39,.45)}
+
+.adminbar{display:none;background:var(--gold);color:var(--navy);text-align:center;padding:11px 16px;font-weight:800;font-size:16px;position:relative;z-index:2}
+.adminbar.on{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
+.adminbar button{background:var(--navy);color:#fff;border:none;padding:8px 16px;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:700;font-size:15px}
+
+.container{max-width:1180px;margin:auto;padding:26px 20px 60px}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:26px}
+.card{background:var(--surface);padding:22px 18px;border-radius:var(--r);box-shadow:var(--shadow-sm);text-align:center;border:1px solid var(--line);position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;top:0;right:0;left:0;height:3px;background:var(--gold);opacity:.85}
+.card .num{font-size:40px;font-weight:900;color:var(--navy);line-height:1}
+.card .cap{font-size:16px;color:var(--muted);font-weight:700;margin-top:9px}
+.card.accent .num{color:var(--red)}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:24px;margin-bottom:26px}
+.panel.admin-only{display:none;border:2px solid var(--gold)}
+.panel.admin-only.on{display:block}
+.panel-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:18px}
+.panel-head h2{margin:0;font-size:24px;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:10px}
+.panel-head h2 .bar{width:6px;height:26px;border-radius:3px;background:var(--gold)}
+.badge{background:var(--amber);color:#fff;border-radius:20px;padding:3px 13px;font-size:16px;font-weight:800;min-width:28px;display:inline-block;text-align:center}
+
+.legend{display:flex;gap:16px 18px;flex-wrap:wrap;font-size:15.5px;font-weight:700;color:var(--ink)}
+.legend span{display:flex;align-items:center;gap:8px}
+.dot{width:17px;height:17px;border-radius:5px;display:inline-block;border:1px solid rgba(0,0,0,.06)}
+.dot.av{background:var(--green-bg);border-color:var(--green-line)}
+.dot.pn{background:var(--amber-bg);border-color:var(--amber-line)}
+.dot.bk{background:var(--red);border-color:var(--red)}
+.dot.td{background:#fff;border:2px solid var(--gold)}
+.dot.ps{background:var(--past-bg);border-color:#dadee3}
+
+.cal-nav{display:flex;align-items:center;gap:12px}
+.cal-nav button{width:46px;height:46px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--navy);cursor:pointer;font-size:24px;font-weight:800;display:grid;place-items:center;transition:.15s}
+.cal-nav button:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+.cal-title{min-width:190px;text-align:center}
+.cal-title .m{font-size:22px;font-weight:800;color:var(--navy)}
+.cal-title .h{font-size:14.5px;color:var(--muted);font-weight:600}
+
+.cal-hint{display:flex;align-items:center;gap:9px;background:var(--green-bg);border:1px solid var(--green-line);color:#15703f;border-radius:10px;padding:11px 14px;font-size:15px;font-weight:700;margin-bottom:14px}
+.cal-hint b{color:#0f5e34}
+.cal-hint .dot{flex:none}
+*{-webkit-tap-highlight-color:transparent}
+.day.available:active,.day.pending:active,.day.confirmed:active{transform:scale(.95)}
+.btn:active,.btn-sm:active,.admin-ic:active,.cal-nav button:active{transform:scale(.97)}
+.weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin:6px 0 8px}
+.weekdays div{text-align:center;font-size:16px;font-weight:800;color:var(--muted);padding:7px 0}
+.weekdays div.fri{color:var(--gold)}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.day{min-height:92px;border-radius:12px;border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;position:relative;background:var(--surface);transition:transform .12s,box-shadow .12s;padding:6px 4px;text-align:center}
+.day .dnum{font-size:27px;line-height:1;font-weight:900}
+.day .dh{font-size:13px;color:var(--muted);font-weight:600;margin-top:3px}
+.day .stt{font-size:13px;font-weight:800;margin-top:4px;opacity:.95;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 2px}
+.day .bname{font-size:12px;font-weight:700;margin-top:2px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px}
+.day.empty{border:none;background:transparent}
+.day.fri-col{box-shadow:inset 0 0 0 1px rgba(201,162,39,.22)}
+.day.available{background:var(--green-bg);border-color:var(--green-line);color:#16703f;cursor:pointer}
+.day.available:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(31,157,87,.22);border-color:var(--green)}
+.day.available .stt{color:#2c9a5e}
+.day.pending{background:var(--amber-bg);border-color:var(--amber-line);color:var(--amber-ink);cursor:pointer}
+.day.pending:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(221,138,30,.22)}
+.day.pending .stt{color:var(--amber)}
+.day.pending .dh{color:#b07d33}
+.day.confirmed{background:var(--red);border-color:var(--red);color:#fff;cursor:pointer}
+.day.confirmed:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(192,57,43,.30)}
+.day.confirmed .dh,.day.confirmed .stt{color:rgba(255,255,255,.85)}
+.day.past{background:var(--past-bg);border-color:#e3e6ea;color:var(--past);cursor:not-allowed}
+.day.past .dh{color:#c2c8cf}
+.day.past.confirmed{background:#d8a39d;border-color:#d8a39d;color:#fff}
+.day.past.confirmed .dh,.day.past.confirmed .stt{color:rgba(255,255,255,.75)}
+.day.today{box-shadow:0 0 0 2px var(--gold)}
+
+.table-wrap{overflow-x:auto;border-radius:var(--r-sm);border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;background:var(--surface);min-width:420px}
+th,td{padding:15px 14px;text-align:center;border-bottom:1px solid var(--line);font-size:16.5px}
+th{background:var(--navy);color:#fff;font-weight:700;font-size:15.5px}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#faf9f4}
+.empty-row td{color:var(--muted);padding:34px;font-weight:600;font-size:16px}
+.pill{display:inline-block;padding:6px 16px;border-radius:20px;font-size:15px;font-weight:800}
+.pill.confirmed{background:var(--red-bg);color:var(--red)}
+.pill.pending{background:var(--amber-bg);color:var(--amber-ink)}
+.btn-sm{padding:9px 17px;border-radius:9px;font-weight:800;cursor:pointer;font-size:15.5px;font-family:inherit;transition:.15s;border:1px solid transparent;margin:2px}
+.btn-approve{background:var(--green-bg);color:#157a41;border-color:var(--green-line)}
+.btn-approve:hover{background:var(--green);color:#fff}
+.btn-reject{background:var(--red-bg);color:var(--red);border-color:var(--red-line)}
+.btn-reject:hover{background:var(--red);color:#fff}
+
+/* admin request cards */
+.req-list{display:grid;gap:14px}
+.req-card{border:1px solid var(--amber-line);background:var(--amber-bg);border-radius:var(--r-sm);padding:18px 20px}
+.req-card .rc-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.req-card .rc-date{font-weight:800;color:var(--navy);font-size:18px}
+.req-card .rc-date .g{font-weight:600;color:var(--muted);font-size:15px}
+.req-card .rc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+.req-card .rc-item .k{font-size:14px;color:var(--muted);font-weight:700}
+.req-card .rc-item .v{font-size:18px;color:var(--ink);font-weight:800}
+.req-card .rc-note{background:#fff;border:1px solid var(--amber-line);border-radius:8px;padding:11px 13px;font-size:16px;margin-bottom:14px}
+.req-card .rc-actions{display:flex;gap:10px}
+.req-card .rc-actions .btn-sm{flex:1;padding:13px;font-size:17px;margin:0}
+
+.overlay{position:fixed;inset:0;background:rgba(13,27,42,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:100;padding:16px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.overlay.show{display:flex;animation:fade .2s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal{background:var(--surface);border-radius:18px;width:100%;max-width:440px;box-shadow:0 24px 60px rgba(0,0,0,.3);overflow:hidden;animation:pop .22s cubic-bezier(.2,.9,.3,1.2);display:flex;flex-direction:column;max-height:calc(100vh - 32px)}
+.modal-body{overflow-y:auto}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.modal-head{background:linear-gradient(135deg,var(--navy),var(--navy-700));color:#fff;padding:20px 22px;display:flex;justify-content:space-between;align-items:flex-start}
+.modal-head .mt{font-size:21px;font-weight:800}
+.modal-head .md{font-size:15px;color:var(--gold-soft);font-weight:600;margin-top:4px}
+.modal-head .md .g{color:#bcc6d2}
+.x{background:rgba(255,255,255,.12);border:none;color:#fff;width:36px;height:36px;border-radius:9px;cursor:pointer;font-size:21px;line-height:1;flex:none}
+.x:hover{background:rgba(255,255,255,.25)}
+.modal-body{padding:22px;overflow-y:auto}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:16px;font-weight:800;color:var(--ink);margin-bottom:7px}
+.field .req{color:var(--red)}
+.field input,.field textarea{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:10px;font-family:inherit;font-size:17px;color:var(--ink);background:#fcfcfa;transition:.15s}
+.field input:focus,.field textarea:focus{outline:none;border-color:var(--gold);background:#fff;box-shadow:0 0 0 3px rgba(201,162,39,.15)}
+.field textarea{resize:vertical;min-height:78px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.privacy-note{background:#eef4fb;border:1px solid #d3e2f3;color:#26466e;border-radius:10px;padding:13px 14px;font-size:14.5px;font-weight:600;margin-bottom:18px;display:flex;gap:9px;align-items:flex-start}
+.privacy-note svg{width:22px;height:22px;flex:none;margin-top:1px}
+.pin-lock{width:62px;height:62px;border-radius:50%;background:var(--amber-bg);border:1px solid var(--amber-line);display:grid;place-items:center;margin:4px auto 16px}
+.pin-lock svg{width:30px;height:30px}
+.pin-input{text-align:center;letter-spacing:14px;font-size:26px!important;font-weight:800;padding-right:14px!important}
+.modal-actions{display:flex;gap:10px;margin-top:6px}
+.btn{flex:1;padding:15px;border-radius:11px;font-family:inherit;font-weight:800;font-size:18px;cursor:pointer;border:none;transition:.15s}
+.btn-primary{background:var(--navy);color:#fff}.btn-primary:hover{background:var(--navy-700)}
+.btn-danger{background:var(--red);color:#fff}.btn-danger:hover{background:#a5311f}
+.btn-ghost{background:#eef0f2;color:var(--ink)}.btn-ghost:hover{background:#e1e4e7}
+.info-big{text-align:center;padding:8px 0 4px}
+.info-big .ic{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;margin:0 auto 12px}
+.info-big.confirmed .ic{background:var(--red-bg)}
+.info-big.pending .ic{background:var(--amber-bg)}
+.info-big .ic svg{width:32px;height:32px}
+.info-big .t{font-size:22px;font-weight:800;color:var(--navy)}
+.info-big .s{font-size:16px;color:var(--muted);margin-top:5px}
+
+.detail-line{display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px dashed var(--line);font-size:17px}
+.detail-line:last-of-type{border-bottom:none}
+.detail-line .k{color:var(--muted);font-weight:600}
+.detail-line .v{font-weight:800;color:var(--ink)}
+.detail-note{background:#faf9f4;border:1px solid var(--line);border-radius:10px;padding:13px;margin-top:10px;font-size:16px}
+
+.toast{position:fixed;bottom:26px;right:50%;transform:translate(50%,140%);background:var(--navy);color:#fff;padding:16px 24px;border-radius:12px;font-weight:700;font-size:16.5px;box-shadow:0 12px 30px rgba(0,0,0,.3);z-index:200;transition:transform .35s cubic-bezier(.2,.9,.3,1.2);border-right:5px solid var(--gold);max-width:90vw}
+.toast.show{transform:translate(50%,0)}
+.toast.ok{border-right-color:var(--green)}
+.toast.err{border-right-color:var(--red)}
+
+@media(max-width:680px){
+  header{padding:22px 16px 22px}
+  .head-inner{flex-direction:column;align-items:center;gap:16px;text-align:center}
+  .brand{flex-direction:row;gap:14px;justify-content:center;align-items:center}
+  .brand-text{text-align:right}
+  .brand-flourish{justify-content:flex-start}
+  .date-card{width:100%;max-width:360px;justify-content:center}
+  .legend{gap:10px 16px;font-size:14.5px}
+}
+@media(max-width:560px){
+  header{padding:24px 16px 22px}
+  .container{padding:20px 14px 50px}
+  .brand-text h1{font-size:27px}
+  .brand-flourish p{font-size:14px}
+  .crest{width:54px;height:54px}
+  .crest svg{width:28px;height:28px}
+  .dc-main{font-size:18px}
+  .admin-ic{width:40px;height:40px;top:14px;left:14px}
+  .admin-ic svg{width:19px;height:19px}
+  .cards{grid-template-columns:repeat(2,1fr);gap:12px}
+  .card{padding:18px 12px}
+  .card .num{font-size:33px}
+  .card .cap{font-size:14.5px}
+  .panel{padding:16px}
+  .panel-head h2{font-size:20px}
+  .weekdays{gap:5px}
+  .weekdays div{font-size:14px;padding:4px 0}
+  .days{gap:5px}
+  .cal-hint{font-size:13.5px;padding:10px 12px}
+  .day{border-radius:10px;padding:5px 3px;min-height:88px}
+  .day .dnum{font-size:23px}
+  .day .dh{display:none}
+  .day .stt{font-size:11px;margin-top:3px;white-space:normal;line-height:1.15}
+  .day .bname{display:none}
+  .cal-title{min-width:150px}
+  .cal-title .m{font-size:19px}
+  .cal-nav button{width:42px;height:42px;font-size:22px}
+  .modal-head{padding:16px 18px}
+  .modal-body{padding:18px}
+  .req-card .rc-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:380px){
+  .day{min-height:82px;padding:4px 2px}
+  .day .stt{font-size:10.5px}
+  .day .dnum{font-size:21px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <button class="admin-ic" id="adminToggle" title="دخول المسؤول" aria-label="دخول المسؤول">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+  </button>
+  <div class="head-inner">
+    <div class="brand">
+      <div class="crest" aria-hidden="true">
+        <span class="crest-ring"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0d1b2a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V10l7-5 7 5v11"/><path d="M9 21v-6h6v6"/></svg>
+      </div>
+      <div class="brand-text">
+        <h1>مجلس الدعيلج</h1>
+        <div class="brand-flourish"><span class="fl"></span><p>نظام حجز الاستراحة</p><span class="fl"></span></div>
+      </div>
+    </div>
+    <div class="date-card">
+      <div class="dc-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="#0d1b2a"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </div>
+      <div class="dc-body">
+        <div class="dc-lbl">تاريخ اليوم</div>
+        <div class="dc-main" id="todayHijri">—</div>
+        <div class="dc-sub"><span id="todayWeekday">—</span> · <span id="todayGreg">—</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+<div class="adminbar" id="adminBar">
+  <span>وضع المسؤول مُفعّل — يمكنك الآن مراجعة الطلبات ورؤية بيانات المتقدمين.</span>
+  <button id="logoutBtn">خروج</button>
+</div>
+
+<div class="container">
+
+  <div class="cards">
+    <div class="card"><div class="num">54</div><div class="cap">عدد الأعضاء</div></div>
+    <div class="card"><div class="num">20</div><div class="cap">المؤسسون</div></div>
+    <div class="card"><div class="num">34</div><div class="cap">الداعمون</div></div>
+    <div class="card accent"><div class="num" id="confirmedCount">0</div><div class="cap">الأيام المحجوزة</div></div>
+  </div>
+
+  <!-- Admin inbox -->
+  <div class="panel admin-only" id="inboxPanel">
+    <div class="panel-head">
+      <h2><span class="bar"></span>طلبات بانتظار الموافقة <span class="badge" id="pendingBadge">0</span></h2>
+    </div>
+    <div class="req-list" id="reqList"></div>
+  </div>
+
+  <!-- Calendar -->
+  <div class="panel">
+    <div class="panel-head">
+      <h2><span class="bar"></span>تقويم الحجوزات</h2>
+      <div class="legend">
+        <span><i class="dot av"></i>متاح</span>
+        <span><i class="dot pn"></i>قيد المراجعة</span>
+        <span><i class="dot bk"></i>محجوز</span>
+        <span><i class="dot td"></i>اليوم</span>
+        <span><i class="dot ps"></i>منتهٍ</span>
+      </div>
+    </div>
+    <div class="panel-head" style="margin-bottom:14px">
+      <div class="cal-nav">
+        <button id="prevM" aria-label="الشهر السابق">›</button>
+        <div class="cal-title"><div class="m" id="calMonth">—</div><div class="h" id="calHijri">—</div></div>
+        <button id="nextM" aria-label="الشهر التالي">‹</button>
+      </div>
+      <button class="btn-sm" style="background:#eef0f2;color:var(--navy);border-color:var(--line)" id="todayBtn">العودة لهذا الشهر</button>
+    </div>
+    <div class="cal-hint"><i class="dot av"></i> اضغط على أي يوم <b>باللون الأخضر</b> لتقديم طلب حجز</div>
+    <div class="weekdays" id="weekdays"></div>
+    <div class="days" id="daysGrid"></div>
+  </div>
+
+  <!-- Status table -->
+  <div class="panel">
+    <div class="panel-head"><h2><span class="bar"></span>سجل الحجوزات</h2></div>
+    <div class="table-wrap">
+      <table id="logTable">
+        <thead id="logHead"></thead>
+        <tbody id="logBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Request modal -->
+<div class="overlay" id="reqOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reqTitle">
+    <div class="modal-head">
+      <div><div class="mt" id="reqTitle">طلب حجز يوم</div><div class="md" id="reqDate">—</div></div>
+      <button class="x" data-close>×</button>
+    </div>
+    <div class="modal-body">
+      <div class="privacy-note">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#264a72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span>بياناتك (الاسم والجوال) تصل إلى المسؤول فقط ولا تظهر لأي مستخدم آخر. سيظهر اليوم للجميع كـ«محجوز» دون أي تفاصيل.</span>
+      </div>
+      <div class="field">
+        <label for="rName">الاسم <span class="req">*</span></label>
+        <input type="text" id="rName" placeholder="الاسم الكامل" autocomplete="off">
+      </div>
+      <div class="field">
+        <label for="rPhone">رقم الجوال <span class="req">*</span></label>
+        <input type="tel" id="rPhone" placeholder="05xxxxxxxx" autocomplete="off" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label for="rCount">عدد الحضور المتوقع</label>
+        <input type="number" id="rCount" min="1" placeholder="اختياري">
+      </div>
+      <div class="field">
+        <label for="rNote">ملاحظات</label>
+        <textarea id="rNote" placeholder="اختياري"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="submitReq">إرسال الطلب</button>
+        <button class="btn btn-ghost" data-close>إلغاء</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Public info modal -->
+<div class="overlay" id="infoOverlay">
+  <div class="modal" role="dialog" aria-modal="true" style="max-width:380px">
+    <div class="modal-head"><div class="mt">حالة اليوم</div><button class="x" data-close>×</button></div>
+    <div class="modal-body"><div id="infoContent"></div>
+      <div class="modal-actions" style="margin-top:18px"><button class="btn btn-ghost" data-close>إغلاق</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- Admin manage modal -->
+<div class="overlay" id="manageOverlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="manageTitle">
+    <div class="modal-head">
+      <div><div class="mt" id="manageTitle">إدارة الحجز</div><div class="md" id="manageDate">—</div></div>
+      <button class="x" data-close>×</button>
+    </div>
+    <div class="modal-body"><div id="manageContent"></div>
+      <div class="modal-actions" id="manageActions" style="margin-top:18px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Admin login modal -->
+<div class="overlay" id="loginOverlay">
+  <div class="modal" role="dialog" aria-modal="true" style="max-width:380px">
+    <div class="modal-head">
+      <div><div class="mt">دخول المسؤول</div><div class="md">مخصّص لمشرف المجلس فقط</div></div>
+      <button class="x" data-close>×</button>
+    </div>
+    <div class="modal-body">
+      <div class="pin-lock" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      </div>
+      <div class="field">
+        <label for="adminPass" style="text-align:center">الرقم السري</label>
+        <input type="password" id="adminPass" class="pin-input" placeholder="••••" autocomplete="off" inputmode="numeric" maxlength="12">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="doLogin">دخول</button>
+        <button class="btn btn-ghost" data-close>إلغاء</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm modal -->
+<div class="overlay" id="confirmOverlay">
+  <div class="modal" role="dialog" aria-modal="true" style="max-width:380px">
+    <div class="modal-head"><div class="mt" id="confirmTitle">تأكيد</div></div>
+    <div class="modal-body">
+      <p style="margin:0 0 18px;font-size:15px" id="confirmMsg">هل أنت متأكد؟</p>
+      <div class="modal-actions">
+        <button class="btn btn-danger" id="confirmYes">تأكيد</button>
+        <button class="btn btn-ghost" data-close>تراجع</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ===== الإعدادات — غيّر كلمة المرور من هنا ===== */
+  var ADMIN_PASS = "1234";
+  /* ============================================== */
+
+  var STORE = "majlis_alduailj_v2";
+  var ADMIN_KEY = "majlis_admin_session";
+
+  /* تخزين آمن: سفاري يرفض localStorage/sessionStorage عند فتح الملف محلياً (file://) ويُطلق خطأً يوقف الصفحة.
+     هذا الغلاف يجرّب التخزين الحقيقي وإلا يستخدم ذاكرة مؤقتة، فلا تتعطّل الصفحة أبداً. */
+  function makeStore(kind){
+    var mem={}, real=null;
+    try{ real=(kind==="session")?window.sessionStorage:window.localStorage; var t="__t"+Math.random(); real.setItem(t,"1"); real.removeItem(t); }
+    catch(e){ real=null; }
+    return {
+      getItem:function(k){ if(real){ try{ return real.getItem(k); }catch(e){} } return mem.hasOwnProperty(k)?mem[k]:null; },
+      setItem:function(k,v){ if(real){ try{ real.setItem(k,v); return; }catch(e){} } mem[k]=String(v); },
+      removeItem:function(k){ if(real){ try{ real.removeItem(k); return; }catch(e){} } delete mem[k]; }
+    };
+  }
+  var LS=makeStore("local"), SS=makeStore("session");
+
+  function pad(n){return n<10?"0"+n:""+n;}
+  function iso(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
+  function startOfToday(){var t=new Date();t.setHours(0,0,0,0);return t;}
+
+  var AR_WEEK=["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+  var HIJRI_MONTHS=["محرم","صفر","ربيع الأول","ربيع الآخر","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"];
+  /* ========= محرّك تقويم أم القرى (بدون الاعتماد على Intl لضمان العمل في سفاري وكل المتصفحات) ========= */
+  var UQ_MIN=1428;
+  /* لكل سنة هجرية: [أطوال الأشهر كبتات, سنة ميلادية, شهر, يوم] ليوم 1 محرم — مستخرجة من تقويم أم القرى الرسمي */
+  var UQ=[3529,2007,1,20,3474,2008,1,10,2726,2008,12,29,2390,2009,12,18,686,2010,12,7,1389,2011,11,26,874,2012,11,15,2901,2013,11,4,2730,2014,10,25,2381,2015,10,14,1181,2016,10,2,2397,2017,9,21,698,2018,9,11,1461,2019,8,31,1450,2020,8,20,3413,2021,8,9,2714,2022,7,30,2350,2023,7,19,622,2024,7,7,1373,2025,6,26,2778,2026,6,16,1748,2027,6,6,1701,2028,5,25,2855,2029,5,14,2637,2030,5,4,1197,2031,4,23,1389,2032,4,11,2906,2033,4,1,1876,2034,3,22,3913,2035,3,11,3730,2036,2,29,3366,2037,2,17,2646,2038,2,6,854,2039,1,26,1717,2040,1,15,2986,2041,1,4,2962,2041,12,25,2853,2042,12,14,1675,2043,12,3,2715,2044,11,21,1370,2045,11,11,2778,2046,10,31,1460,2047,10,21,3497,2048,10,9,2898,2049,9,29,2714,2050,9,18,1334,2051,9,7,630,2052,8,26,1397,2053,8,15,2802,2054,8,5,1748,2055,7,26,1705,2056,7,14,1365,2057,7,3,685,2058,6,22,1213,2059,6,11,2490,2060,5,31,1396,2061,5,21,2921,2062,5,10,2898,2063,4,30,2709,2064,4,18,1325,2065,4,7,2653,2066,3,27,1242,2067,3,17,2777,2068,3,5,1714,2069,2,23,3733,2070,2,12,3626,2071,2,2,3222,2072,1,22,2350,2073,1,10,2733,2073,12,30,1386,2074,12,20,3429,2075,12,9,3402,2076,11,28];
+  function g2jdn(y,m,d){var a=Math.floor((14-m)/12),yy=y+4800-a,mm=m+12*a-3;return d+Math.floor((153*mm+2)/5)+365*yy+Math.floor(yy/4)-Math.floor(yy/100)+Math.floor(yy/400)-32045;}
+  function jdn2gDate(j){var a=j+32044,b=Math.floor((4*a+3)/146097),c=a-Math.floor(146097*b/4);var d2=Math.floor((4*c+3)/1461),e=c-Math.floor(1461*d2/4),m2=Math.floor((5*e+2)/153);var day=e-Math.floor((153*m2+2)/5)+1,month=m2+3-12*Math.floor(m2/10),year=100*b+d2-4800+Math.floor(m2/10);return new Date(year,month-1,day);}
+  var UQ_N=UQ.length/4, UQ_ANCH=[];
+  (function(){for(var i=0;i<UQ_N;i++)UQ_ANCH.push(g2jdn(UQ[i*4+1],UQ[i*4+2],UQ[i*4+3]));})();
+  function toHijri(date){
+    if(!date) return null;
+    var jdn=g2jdn(date.getFullYear(),date.getMonth()+1,date.getDate());
+    if(jdn<UQ_ANCH[0]||jdn>=UQ_ANCH[UQ_N-1]) return null;
+    var lo=0,hi=UQ_N-1;
+    while(lo<hi){var mid=(lo+hi+1)>>1;if(UQ_ANCH[mid]<=jdn)lo=mid;else hi=mid-1;}
+    var i=lo,flags=UQ[i*4],off=jdn-UQ_ANCH[i],m=1;
+    while(m<=12){var len=29+((flags>>(m-1))&1);if(off<len)break;off-=len;m++;}
+    return {y:UQ_MIN+i,m:m,d:off+1};
+  }
+  function gregFromHijri(hy,hm,hd){
+    var i=hy-UQ_MIN;
+    if(i<0||i>=UQ_N){var g=new Date();g.setDate(1);return g;}
+    var flags=UQ[i*4],off=hd-1;
+    for(var k=1;k<hm;k++) off+=29+((flags>>(k-1))&1);
+    return jdn2gDate(UQ_ANCH[i]+off);
+  }
+  /* ----- تنسيق عربي خالص بدون Intl ----- */
+  function arDigits(s){s=String(s);var D="٠١٢٣٤٥٦٧٨٩";return s.replace(/[0-9]/g,function(c){return D.charAt(+c);});}
+  var GREG_MONTHS=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+  function fmtGreg(d){return arDigits(d.getDate())+" "+GREG_MONTHS[d.getMonth()]+" "+arDigits(d.getFullYear());}
+  function fmtGregMonthYear(d){return GREG_MONTHS[d.getMonth()]+" "+arDigits(d.getFullYear());}
+  function fmtGregDayMonth(d){return arDigits(d.getDate())+" "+GREG_MONTHS[d.getMonth()];}
+  function fmtWeekday(d){return AR_WEEK[d.getDay()];}
+  function hijriOf(d){var h=toHijri(d);if(!h)return "";return arDigits(h.d)+" "+HIJRI_MONTHS[h.m-1]+" "+arDigits(h.y)+" هـ";}
+  function hijriDay(d){var h=toHijri(d);return h?arDigits(h.d):"";}
+  /* كائنات بواجهة format() لتوافق بقية الشيفرة */
+  var gregFmt={format:fmtGreg}, weekdayFmt={format:fmtWeekday}, gMonthFmt={format:fmtGregMonthYear}, gDayMonth={format:fmtGregDayMonth};
+  var hijriNum=1; /* محرّك التقويم متوفّر دائماً */
+
+
+  function loadData(){try{return JSON.parse(LS.getItem(STORE))||{};}catch(e){return {};}}
+  function saveData(o){try{LS.setItem(STORE,JSON.stringify(o));}catch(e){}}
+  var bookings=loadData();
+
+  var nowInit = new Date();
+  var gView = {y:nowInit.getFullYear(), m:nowInit.getMonth()};   // الشهر الميلادي المعروض (m: 0-11)
+  var isAdmin = SS.getItem(ADMIN_KEY)==="1";
+  var pendingDate=null, manageDate=null, confirmCb=null;
+
+  var $=function(id){return document.getElementById(id);};
+  var daysGrid=$("daysGrid");
+
+  var toastTimer;
+  function toast(msg,type){var t=$("toast");t.textContent=msg;t.className="toast show "+(type||"");clearTimeout(toastTimer);toastTimer=setTimeout(function(){t.className="toast "+(type||"");},2600);}
+  function escapeHtml(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+  function fullDateHtml(d){return (hijriOf(d)||"")+' &nbsp;<span class="g">'+gregFmt.format(d)+' م</span>';}
+
+  /* today chip */
+  (function(){var now=new Date();$("todayHijri").textContent=hijriOf(now)||"—";$("todayWeekday").textContent=weekdayFmt.format(now);$("todayGreg").textContent=gregFmt.format(now)+" م";})();
+  /* weekdays */
+  (function(){var h="";for(var i=0;i<7;i++){h+='<div'+(i===5?' class="fri"':'')+'>'+AR_WEEK[i]+'</div>';}$("weekdays").innerHTML=h;})();
+
+  function renderCalendar(){
+    var gy=gView.y, gm=gView.m, today=startOfToday();
+    var first=new Date(gy,gm,1);
+    var startPad=first.getDay();                 // 0=الأحد
+    var dim=new Date(gy,gm+1,0).getDate();       // عدد أيام الشهر الميلادي
+
+    /* العنوان: ميلادي أساسي + يوافقه هجرياً */
+    $("calMonth").textContent=GREG_MONTHS[gm]+" "+arDigits(gy)+" م";
+    var h1=toHijri(first), h2=toHijri(new Date(gy,gm,dim));
+    if(h1 && h2){
+      var hpart = (h1.m===h2.m)? HIJRI_MONTHS[h1.m-1] : (HIJRI_MONTHS[h1.m-1]+" – "+HIJRI_MONTHS[h2.m-1]);
+      var hyear = (h1.y===h2.y)? arDigits(h1.y) : (arDigits(h1.y)+"/"+arDigits(h2.y));
+      $("calHijri").textContent="يوافق "+hpart+" "+hyear+" هـ";
+    }else{
+      $("calHijri").textContent="";
+    }
+
+    var html="";
+    for(var i=0;i<startPad;i++){html+='<div class="day empty"></div>';}
+    for(var d=1;d<=dim;d++){
+      var gd=new Date(gy,gm,d);
+      var key=iso(gd);
+      var h=toHijri(gd);
+      var isFri=gd.getDay()===5, isToday=gd.getTime()===today.getTime(), isPast=gd<today;
+      var bk=bookings[key];
+      var hijLabel = h ? (arDigits(h.d)+(h.d===1 ? " "+HIJRI_MONTHS[h.m-1] : "")) : "";
+      var cls="day"+(isFri?" fri-col":"")+(isToday?" today":"");
+      var inner='<span class="dnum">'+d+'</span><span class="dh">'+hijLabel+'</span>';
+
+      if(bk && bk.status==="confirmed"){
+        cls+=" confirmed"+(isPast?" past":"");
+        inner+='<span class="stt">محجوز</span>';
+        if(isAdmin) inner+='<span class="bname">'+escapeHtml(bk.name)+'</span>';
+        html+='<div class="'+cls+'" data-date="'+key+'" data-act="manage" tabindex="0" role="button" aria-label="محجوز">'+inner+'</div>';
+      }else if(bk && bk.status==="pending"){
+        cls+=" pending";
+        inner+='<span class="stt">قيد المراجعة</span>';
+        if(isAdmin) inner+='<span class="bname" style="color:var(--amber-ink)">'+escapeHtml(bk.name)+'</span>';
+        html+='<div class="'+cls+'" data-date="'+key+'" data-act="manage" tabindex="0" role="button" aria-label="قيد المراجعة">'+inner+'</div>';
+      }else if(isPast){
+        cls+=" past";
+        html+='<div class="'+cls+'" aria-label="منتهٍ">'+inner+'</div>';
+      }else{
+        cls+=" available";
+        inner+='<span class="stt">متاح</span>';
+        html+='<div class="'+cls+'" data-date="'+key+'" data-act="request" tabindex="0" role="button" aria-label="متاح للحجز">'+inner+'</div>';
+      }
+    }
+    daysGrid.innerHTML=html;
+  }
+
+  function renderStats(){
+    var c=0,p=0;
+    for(var k in bookings){if(bookings[k].status==="confirmed")c++;else if(bookings[k].status==="pending")p++;}
+    $("confirmedCount").textContent=c;
+    $("pendingBadge").textContent=p;
+  }
+
+  function renderTable(){
+    var head=$("logHead"),body=$("logBody");
+    var keys=Object.keys(bookings).sort();
+    if(isAdmin){
+      head.innerHTML='<tr><th>التاريخ</th><th>اليوم</th><th>الحالة</th><th>الاسم</th><th>الجوال</th><th>الحضور</th><th>إجراء</th></tr>';
+    }else{
+      head.innerHTML='<tr><th>التاريخ</th><th>اليوم</th><th>الحالة</th></tr>';
+    }
+    if(keys.length===0){
+      body.innerHTML='<tr class="empty-row"><td colspan="'+(isAdmin?7:3)+'">لا توجد حجوزات حتى الآن.</td></tr>';
+      return;
+    }
+    var html="";
+    keys.forEach(function(k){
+      var b=bookings[k],d=new Date(k+"T00:00:00");
+      var pill='<span class="pill '+b.status+'">'+(b.status==="confirmed"?"محجوز":"قيد المراجعة")+'</span>';
+      var dateCell=(hijriOf(d)||gregFmt.format(d))+'<br><span style="font-size:11px;color:var(--muted)">'+gregFmt.format(d)+' م</span>';
+      if(isAdmin){
+        html+='<tr><td>'+dateCell+'</td><td>'+weekdayFmt.format(d)+'</td><td>'+pill+'</td>'+
+          '<td><strong>'+escapeHtml(b.name)+'</strong></td><td>'+escapeHtml(b.phone)+'</td><td>'+(b.count?escapeHtml(b.count):"—")+'</td>'+
+          '<td><button class="btn-sm btn-reject" data-manage="'+k+'">إدارة</button></td></tr>';
+      }else{
+        html+='<tr><td>'+dateCell+'</td><td>'+weekdayFmt.format(d)+'</td><td>'+pill+'</td></tr>';
+      }
+    });
+    body.innerHTML=html;
+  }
+
+  function renderInbox(){
+    var list=$("reqList");
+    var keys=Object.keys(bookings).filter(function(k){return bookings[k].status==="pending";}).sort();
+    if(keys.length===0){ list.innerHTML='<div class="empty-row" style="text-align:center;color:var(--muted);padding:20px;font-weight:600">لا توجد طلبات معلّقة حالياً.</div>'; return; }
+    var html="";
+    keys.forEach(function(k){
+      var b=bookings[k],d=new Date(k+"T00:00:00");
+      html+='<div class="req-card">'+
+        '<div class="rc-top"><div class="rc-date">'+weekdayFmt.format(d)+' — '+(hijriOf(d)||"")+' <span class="g">('+gregFmt.format(d)+' م)</span></div></div>'+
+        '<div class="rc-grid">'+
+          '<div class="rc-item"><div class="k">الاسم</div><div class="v">'+escapeHtml(b.name)+'</div></div>'+
+          '<div class="rc-item"><div class="k">الجوال</div><div class="v">'+escapeHtml(b.phone)+'</div></div>'+
+          '<div class="rc-item"><div class="k">عدد الحضور</div><div class="v">'+(b.count?escapeHtml(b.count):"—")+'</div></div>'+
+        '</div>'+
+        (b.note?'<div class="rc-note">'+escapeHtml(b.note)+'</div>':'')+
+        '<div class="rc-actions">'+
+          '<button class="btn-sm btn-approve" data-approve="'+k+'">موافقة واعتماد</button>'+
+          '<button class="btn-sm btn-reject" data-decline="'+k+'">رفض</button>'+
+        '</div></div>';
+    });
+    list.innerHTML=html;
+  }
+
+  function renderAll(){renderCalendar();renderStats();renderTable();if(isAdmin)renderInbox();}
+
+  /* admin mode UI */
+  function applyAdminUI(){
+    $("inboxPanel").classList.toggle("on",isAdmin);
+    $("adminBar").classList.toggle("on",isAdmin);
+    var ic=$("adminToggle");
+    ic.classList.toggle("is-admin",isAdmin);
+    ic.setAttribute("title", isAdmin? "وضع المسؤول مُفعّل" : "دخول المسؤول");
+    ic.setAttribute("aria-label", isAdmin? "وضع المسؤول مُفعّل" : "دخول المسؤول");
+  }
+
+  /* overlays */
+  function open(id){$(id).classList.add("show");}
+  function close(id){$(id).classList.remove("show");}
+  function closeAll(){document.querySelectorAll(".overlay").forEach(function(o){o.classList.remove("show");});}
+
+  function openRequest(key){
+    pendingDate=key;var d=new Date(key+"T00:00:00");
+    $("reqTitle").textContent="طلب حجز يوم "+weekdayFmt.format(d);
+    $("reqDate").innerHTML=fullDateHtml(d);
+    $("rName").value="";$("rPhone").value="";$("rCount").value="";$("rNote").value="";
+    open("reqOverlay");setTimeout(function(){$("rName").focus();},60);
+  }
+
+  function openInfo(key){
+    var b=bookings[key];if(!b)return;
+    var confirmed=b.status==="confirmed";
+    var icon=confirmed
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="#dd8a1e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+    $("infoContent").innerHTML='<div class="info-big '+b.status+'"><div class="ic">'+icon+'</div>'+
+      '<div class="t">'+(confirmed?"هذا اليوم محجوز":"هذا اليوم قيد المراجعة")+'</div>'+
+      '<div class="s">'+(confirmed?"تم اعتماد الحجز من المسؤول.":"يوجد طلب حجز بانتظار موافقة المسؤول.")+'</div></div>';
+    open("infoOverlay");
+  }
+
+  function openManage(key){
+    manageDate=key;var b=bookings[key];if(!b)return;var d=new Date(key+"T00:00:00");
+    $("manageTitle").textContent = b.status==="confirmed"?"حجز معتمد":"طلب قيد المراجعة";
+    $("manageDate").innerHTML=fullDateHtml(d);
+    var c='<div class="detail-line"><span class="k">الاسم</span><span class="v">'+escapeHtml(b.name)+'</span></div>'+
+          '<div class="detail-line"><span class="k">الجوال</span><span class="v">'+escapeHtml(b.phone)+'</span></div>'+
+          '<div class="detail-line"><span class="k">اليوم</span><span class="v">'+weekdayFmt.format(d)+'</span></div>'+
+          '<div class="detail-line"><span class="k">عدد الحضور</span><span class="v">'+(b.count?escapeHtml(b.count):"—")+'</span></div>';
+    if(b.note) c+='<div class="detail-note">'+escapeHtml(b.note)+'</div>';
+    $("manageContent").innerHTML=c;
+    var acts="";
+    if(b.status==="pending"){
+      acts='<button class="btn btn-primary" id="mApprove">موافقة واعتماد</button><button class="btn btn-danger" id="mReject">رفض</button>';
+    }else{
+      acts='<button class="btn btn-danger" id="mCancel">إلغاء الحجز</button><button class="btn btn-ghost" data-close>إغلاق</button>';
+    }
+    $("manageActions").innerHTML=acts;
+    if($("mApprove")) $("mApprove").onclick=function(){approve(key);close("manageOverlay");};
+    if($("mReject"))  $("mReject").onclick=function(){close("manageOverlay");askConfirm("رفض الطلب","سيتم رفض هذا الطلب وإعادة اليوم متاحاً. متابعة؟",function(){decline(key);});};
+    if($("mCancel"))  $("mCancel").onclick=function(){close("manageOverlay");askConfirm("إلغاء الحجز","سيتم إلغاء هذا الحجز المعتمد. متابعة؟",function(){decline(key);});};
+    open("manageOverlay");
+  }
+
+  function askConfirm(title,msg,cb){$("confirmTitle").textContent=title;$("confirmMsg").textContent=msg;confirmCb=cb;open("confirmOverlay");}
+
+  /* actions */
+  function submitRequest(){
+    var name=$("rName").value.trim(),phone=$("rPhone").value.trim();
+    var count=$("rCount").value.trim(),note=$("rNote").value.trim();
+    if(!name){toast("الرجاء إدخال الاسم","err");$("rName").focus();return;}
+    if(!phone){toast("الرجاء إدخال رقم الجوال","err");$("rPhone").focus();return;}
+    if(phone.replace(/\D/g,"").length<9){toast("رقم الجوال غير صحيح","err");$("rPhone").focus();return;}
+    if(count && (isNaN(count)||Number(count)<1)){toast("عدد الحضور غير صحيح","err");return;}
+    if(bookings[pendingDate]){toast("تم حجز هذا اليوم للتو، اختر يوماً آخر","err");close("reqOverlay");renderAll();return;}
+    bookings[pendingDate]={status:"pending",name:name,phone:phone,count:count,note:note,createdAt:Date.now()};
+    saveData(bookings);close("reqOverlay");renderAll();
+    toast("تم إرسال طلبك، بانتظار موافقة المسؤول ✓","ok");
+  }
+  function approve(key){if(!bookings[key])return;bookings[key].status="confirmed";bookings[key].decidedAt=Date.now();saveData(bookings);renderAll();toast("تم اعتماد الحجز ✓","ok");}
+  function decline(key){delete bookings[key];saveData(bookings);renderAll();toast("تم تحديث الحالة","ok");}
+
+  /* events */
+  daysGrid.addEventListener("click",function(e){
+    var cell=e.target.closest(".day");if(!cell)return;
+    var key=cell.getAttribute("data-date");if(!key)return;
+    var act=cell.getAttribute("data-act");
+    if(act==="request") openRequest(key);
+    else if(act==="manage"){ isAdmin?openManage(key):openInfo(key); }
+  });
+  daysGrid.addEventListener("keydown",function(e){if(e.key!=="Enter"&&e.key!==" ")return;var cell=e.target.closest(".day");if(!cell||!cell.getAttribute("data-date"))return;e.preventDefault();cell.click();});
+
+  $("reqList").addEventListener("click",function(e){
+    var a=e.target.closest("[data-approve]"),r=e.target.closest("[data-decline]");
+    if(a) approve(a.getAttribute("data-approve"));
+    else if(r){var k=r.getAttribute("data-decline");askConfirm("رفض الطلب","سيتم رفض هذا الطلب وإعادة اليوم متاحاً. متابعة؟",function(){decline(k);});}
+  });
+  $("logBody").addEventListener("click",function(e){var m=e.target.closest("[data-manage]");if(m)openManage(m.getAttribute("data-manage"));});
+
+  $("submitReq").addEventListener("click",submitRequest);
+  ["rName","rPhone","rCount"].forEach(function(id){$(id).addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();submitRequest();}});});
+
+  $("confirmYes").addEventListener("click",function(){close("confirmOverlay");if(confirmCb){confirmCb();confirmCb=null;}});
+
+  $("prevM").addEventListener("click",function(){gView.m--;if(gView.m<0){gView.m=11;gView.y--;}renderCalendar();});
+  $("nextM").addEventListener("click",function(){gView.m++;if(gView.m>11){gView.m=0;gView.y++;}renderCalendar();});
+  $("todayBtn").addEventListener("click",function(){var n=new Date();gView.y=n.getFullYear();gView.m=n.getMonth();renderCalendar();});
+
+  /* admin login/logout */
+  $("adminToggle").addEventListener("click",function(){
+    if(isAdmin){ var ip=$("inboxPanel"); if(ip) ip.scrollIntoView({behavior:"smooth",block:"start"}); return; }
+    $("adminPass").value="";open("loginOverlay");setTimeout(function(){$("adminPass").focus();},80);
+  });
+  function doLogin(){
+    if($("adminPass").value===ADMIN_PASS){
+      isAdmin=true;SS.setItem(ADMIN_KEY,"1");
+      close("loginOverlay");applyAdminUI();renderAll();toast("تم تسجيل الدخول كمسؤول ✓","ok");
+    }else{toast("كلمة المرور غير صحيحة","err");$("adminPass").select();}
+  }
+  $("doLogin").addEventListener("click",doLogin);
+  $("adminPass").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();doLogin();}});
+  $("logoutBtn").addEventListener("click",function(){isAdmin=false;SS.removeItem(ADMIN_KEY);applyAdminUI();renderAll();toast("تم الخروج من وضع المسؤول","ok");});
+
+  document.querySelectorAll("[data-close]").forEach(function(b){b.addEventListener("click",closeAll);});
+  document.querySelectorAll(".overlay").forEach(function(o){o.addEventListener("click",function(e){if(e.target===o)closeAll();});});
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")closeAll();});
+
+  /* init */
+  applyAdminUI();
+  renderAll();
+})();
+</script>
+</body>
+</html>
