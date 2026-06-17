@@ -245,6 +245,8 @@ tbody tr:hover{background:#faf9f4}
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+<!-- Supabase JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -437,26 +439,33 @@ tbody tr:hover{background:#faf9f4}
 (function(){
   "use strict";
 
-  /* ===== الإعدادات — غيّر كلمة المرور من هنا ===== */
-  var ADMIN_PASS = "1234";
-  /* ============================================== */
+  /* ============================================================
+     إعداد Supabase  —  اتبع ملف SETUP-AR.md خطوة بخطوة
+     1) أنشئ مشروعًا مجانيًا: https://supabase.com  (تسجيل بالبريد أو GitHub)
+     2) SQL Editor: الصق محتوى supabase-setup.sql ونفّذه (Run)
+     3) Authentication → Users → Add user: أنشئ حساب المسؤول
+     4) ضع بريد المسؤول في ADMIN_EMAIL (نفسه داخل ملف SQL)
+     5) Project Settings → API: انسخ URL و anon key بالأسفل
+     ============================================================ */
+  var ADMIN_EMAIL   = "admin@majlis.app";          // بريد حساب المسؤول
+  var SUPABASE_URL  = "ضع_Project_URL_هنا";        // مثل: https://xxxxx.supabase.co
+  var SUPABASE_ANON = "ضع_anon_public_key_هنا";    // مفتاح anon العام (آمن في الصفحة)
+  /* ============================================================ */
+  var sb = null;
+  var MODE = "local";   // يُضبط تلقائيًا: local عند غياب المفاتيح، cloud عند وجودها
 
-  var STORE = "majlis_alduailj_v2";
-  var ADMIN_KEY = "majlis_admin_session";
-
-  /* تخزين آمن: سفاري يرفض localStorage/sessionStorage عند فتح الملف محلياً (file://) ويُطلق خطأً يوقف الصفحة.
-     هذا الغلاف يجرّب التخزين الحقيقي وإلا يستخدم ذاكرة مؤقتة، فلا تتعطّل الصفحة أبداً. */
-  function makeStore(kind){
-    var mem={}, real=null;
-    try{ real=(kind==="session")?window.sessionStorage:window.localStorage; var t="__t"+Math.random(); real.setItem(t,"1"); real.removeItem(t); }
-    catch(e){ real=null; }
-    return {
-      getItem:function(k){ if(real){ try{ return real.getItem(k); }catch(e){} } return mem.hasOwnProperty(k)?mem[k]:null; },
-      setItem:function(k,v){ if(real){ try{ real.setItem(k,v); return; }catch(e){} } mem[k]=String(v); },
-      removeItem:function(k){ if(real){ try{ real.removeItem(k); return; }catch(e){} } delete mem[k]; }
-    };
+  /* ===== الوضع المحلي: يعمل فور التحميل بلا إعداد (هذا الجهاز فقط) ===== */
+  var LOCAL_PASS  = "1234";              // كلمة مرور المسؤول في الوضع المحلي فقط — غيّرها إن شئت
+  var LOCAL_KEY   = "majlis_local_v1";
+  var LOCAL_ADMIN = "majlis_local_admin";
+  function lsGet(){ try{ return JSON.parse(localStorage.getItem(LOCAL_KEY))||{}; }catch(e){ return {}; } }
+  function lsSet(o){ try{ localStorage.setItem(LOCAL_KEY, JSON.stringify(o)); }catch(e){} }
+  function loadLocal(){
+    var d=lsGet(); dayMap={}; detailMap={};
+    for(var k in d){ dayMap[k]={status:d[k].status};
+      detailMap[k]={name:d[k].name,phone:d[k].phone,count:d[k].count,note:d[k].note}; }
+    rebuildBookings(); renderAll();
   }
-  var LS=makeStore("local"), SS=makeStore("session");
 
   function pad(n){return n<10?"0"+n:""+n;}
   function iso(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
@@ -503,13 +512,19 @@ tbody tr:hover{background:#faf9f4}
   var hijriNum=1; /* محرّك التقويم متوفّر دائماً */
 
 
-  function loadData(){try{return JSON.parse(LS.getItem(STORE))||{};}catch(e){return {};}}
-  function saveData(o){try{LS.setItem(STORE,JSON.stringify(o));}catch(e){}}
-  var bookings=loadData();
+  /* dayMap عام (الحالة فقط) + detailMap خاص (للمسؤول)؛ bookings دمجهما لدوال العرض */
+  var dayMap={}, detailMap={}, bookings={};
+  function rebuildBookings(){
+    bookings={};
+    for(var k in dayMap){ bookings[k]={status:(dayMap[k]&&dayMap[k].status)||"pending"}; }
+    for(var j in detailMap){ if(bookings[j]){ var dt=detailMap[j];
+      bookings[j].name=dt.name; bookings[j].phone=dt.phone; bookings[j].count=dt.count; bookings[j].note=dt.note; } }
+  }
 
   var nowInit = new Date();
-  var gView = {y:nowInit.getFullYear(), m:nowInit.getMonth()};   // الشهر الميلادي المعروض (m: 0-11)
-  var isAdmin = SS.getItem(ADMIN_KEY)==="1";
+  var _h0 = toHijri(nowInit) || {y:UQ_MIN, m:1};
+  var hView = {y:_h0.y, m:_h0.m};   // الشهر الهجري المعروض (m: 1-12)
+  var isAdmin = false;
   var pendingDate=null, manageDate=null, confirmCb=null;
 
   var $=function(id){return document.getElementById(id);};
@@ -525,34 +540,35 @@ tbody tr:hover{background:#faf9f4}
   /* weekdays */
   (function(){var h="";for(var i=0;i<7;i++){h+='<div'+(i===5?' class="fri"':'')+'>'+AR_WEEK[i]+'</div>';}$("weekdays").innerHTML=h;})();
 
-  function renderCalendar(){
-    var gy=gView.y, gm=gView.m, today=startOfToday();
-    var first=new Date(gy,gm,1);
-    var startPad=first.getDay();                 // 0=الأحد
-    var dim=new Date(gy,gm+1,0).getDate();       // عدد أيام الشهر الميلادي
+  function hijriMonthLen(hy,hm){ var i=hy-UQ_MIN; if(i<0||i>=UQ_N) return 30; var flags=UQ[i*4]; return 29+((flags>>(hm-1))&1); }
 
-    /* العنوان: ميلادي أساسي + يوافقه هجرياً */
-    $("calMonth").textContent=GREG_MONTHS[gm]+" "+arDigits(gy)+" م";
-    var h1=toHijri(first), h2=toHijri(new Date(gy,gm,dim));
-    if(h1 && h2){
-      var hpart = (h1.m===h2.m)? HIJRI_MONTHS[h1.m-1] : (HIJRI_MONTHS[h1.m-1]+" – "+HIJRI_MONTHS[h2.m-1]);
-      var hyear = (h1.y===h2.y)? arDigits(h1.y) : (arDigits(h1.y)+"/"+arDigits(h2.y));
-      $("calHijri").textContent="يوافق "+hpart+" "+hyear+" هـ";
-    }else{
-      $("calHijri").textContent="";
-    }
+  function renderCalendar(){
+    var hy=hView.y, hm=hView.m, today=startOfToday();
+    var len=hijriMonthLen(hy,hm);
+    var first=gregFromHijri(hy,hm,1);
+    var startPad=first.getDay();                 // 0=الأحد
+
+    /* العنوان: هجري أساسي + يوافقه ميلادياً */
+    $("calMonth").textContent=HIJRI_MONTHS[hm-1]+" "+arDigits(hy)+" هـ";
+    var glast=gregFromHijri(hy,hm,len);
+    var gpart=(first.getMonth()===glast.getMonth())
+      ? GREG_MONTHS[first.getMonth()]
+      : (GREG_MONTHS[first.getMonth()]+" – "+GREG_MONTHS[glast.getMonth()]);
+    var gyear=(first.getFullYear()===glast.getFullYear())
+      ? arDigits(first.getFullYear())
+      : (arDigits(first.getFullYear())+"/"+arDigits(glast.getFullYear()));
+    $("calHijri").textContent="يوافق "+gpart+" "+gyear+" م";
 
     var html="";
     for(var i=0;i<startPad;i++){html+='<div class="day empty"></div>';}
-    for(var d=1;d<=dim;d++){
-      var gd=new Date(gy,gm,d);
+    for(var d=1;d<=len;d++){
+      var gd=gregFromHijri(hy,hm,d);
       var key=iso(gd);
-      var h=toHijri(gd);
       var isFri=gd.getDay()===5, isToday=gd.getTime()===today.getTime(), isPast=gd<today;
       var bk=bookings[key];
-      var hijLabel = h ? (arDigits(h.d)+(h.d===1 ? " "+HIJRI_MONTHS[h.m-1] : "")) : "";
+      var gLabel = arDigits(gd.getDate())+(gd.getDate()===1 ? " "+GREG_MONTHS[gd.getMonth()] : "");
       var cls="day"+(isFri?" fri-col":"")+(isToday?" today":"");
-      var inner='<span class="dnum">'+d+'</span><span class="dh">'+hijLabel+'</span>';
+      var inner='<span class="dnum">'+arDigits(d)+'</span><span class="dh">'+gLabel+'</span>';
 
       if(bk && bk.status==="confirmed"){
         cls+=" confirmed"+(isPast?" past":"");
@@ -705,12 +721,33 @@ tbody tr:hover{background:#faf9f4}
     if(phone.replace(/\D/g,"").length<9){toast("رقم الجوال غير صحيح","err");$("rPhone").focus();return;}
     if(count && (isNaN(count)||Number(count)<1)){toast("عدد الحضور غير صحيح","err");return;}
     if(bookings[pendingDate]){toast("تم حجز هذا اليوم للتو، اختر يوماً آخر","err");close("reqOverlay");renderAll();return;}
-    bookings[pendingDate]={status:"pending",name:name,phone:phone,count:count,note:note,createdAt:Date.now()};
-    saveData(bookings);close("reqOverlay");renderAll();
-    toast("تم إرسال طلبك، بانتظار موافقة المسؤول ✓","ok");
+    if(MODE==="local"){
+      var dd=lsGet(); dd[pendingDate]={status:"pending",name:name,phone:phone,count:count,note:note,createdAt:Date.now()};
+      lsSet(dd); loadLocal(); close("reqOverlay"); toast("تم إرسال طلبك، بانتظار موافقة المسؤول ✓","ok"); return;
+    }
+    if(!sb){toast("النظام غير مهيّأ بعد، تواصل مع المسؤول","err");return;}
+    var sub=$("submitReq"); sub.disabled=true;
+    sb.from("days").insert({date:pendingDate, status:"pending"})
+      .then(function(res){ if(res.error) throw res.error;
+        return sb.from("details").insert({date:pendingDate, name:name, phone:phone, count:count, note:note}); })
+      .then(function(res){ if(res && res.error) throw res.error;
+        close("reqOverlay"); toast("تم إرسال طلبك، بانتظار موافقة المسؤول ✓","ok"); })
+      .catch(function(e){ toast("تعذّر الإرسال — قد يكون اليوم حُجز للتو أو هناك خلل بالاتصال","err"); })
+      .then(function(){ sub.disabled=false; });
   }
-  function approve(key){if(!bookings[key])return;bookings[key].status="confirmed";bookings[key].decidedAt=Date.now();saveData(bookings);renderAll();toast("تم اعتماد الحجز ✓","ok");}
-  function decline(key){delete bookings[key];saveData(bookings);renderAll();toast("تم تحديث الحالة","ok");}
+  function approve(key){
+    if(MODE==="local"){ var d=lsGet(); if(d[key]){ d[key].status="confirmed"; lsSet(d); loadLocal(); toast("تم اعتماد الحجز ✓","ok"); } return; }
+    if(!sb)return;
+    sb.from("days").update({status:"confirmed"}).eq("date",key)
+      .then(function(res){ res.error?toast("تعذّر الاعتماد","err"):toast("تم اعتماد الحجز ✓","ok"); });
+  }
+  function decline(key){
+    if(MODE==="local"){ var d=lsGet(); delete d[key]; lsSet(d); loadLocal(); toast("تم تحديث الحالة","ok"); return; }
+    if(!sb)return;
+    sb.from("details").delete().eq("date",key)
+      .then(function(){ return sb.from("days").delete().eq("date",key); })
+      .then(function(res){ (res&&res.error)?toast("تعذّر التحديث","err"):toast("تم تحديث الحالة","ok"); });
+  }
 
   /* events */
   daysGrid.addEventListener("click",function(e){
@@ -734,9 +771,9 @@ tbody tr:hover{background:#faf9f4}
 
   $("confirmYes").addEventListener("click",function(){close("confirmOverlay");if(confirmCb){confirmCb();confirmCb=null;}});
 
-  $("prevM").addEventListener("click",function(){gView.m--;if(gView.m<0){gView.m=11;gView.y--;}renderCalendar();});
-  $("nextM").addEventListener("click",function(){gView.m++;if(gView.m>11){gView.m=0;gView.y++;}renderCalendar();});
-  $("todayBtn").addEventListener("click",function(){var n=new Date();gView.y=n.getFullYear();gView.m=n.getMonth();renderCalendar();});
+  $("prevM").addEventListener("click",function(){var y=hView.y,m=hView.m-1;if(m<1){m=12;y--;}if(y<UQ_MIN)return;hView.y=y;hView.m=m;renderCalendar();});
+  $("nextM").addEventListener("click",function(){var y=hView.y,m=hView.m+1;if(m>12){m=1;y++;}if(y>UQ_MIN+UQ_N-2)return;hView.y=y;hView.m=m;renderCalendar();});
+  $("todayBtn").addEventListener("click",function(){var h=toHijri(new Date());if(h){hView.y=h.y;hView.m=h.m;renderCalendar();}});
 
   /* admin login/logout */
   $("adminToggle").addEventListener("click",function(){
@@ -744,22 +781,77 @@ tbody tr:hover{background:#faf9f4}
     $("adminPass").value="";open("loginOverlay");setTimeout(function(){$("adminPass").focus();},80);
   });
   function doLogin(){
-    if($("adminPass").value===ADMIN_PASS){
-      isAdmin=true;SS.setItem(ADMIN_KEY,"1");
-      close("loginOverlay");applyAdminUI();renderAll();toast("تم تسجيل الدخول كمسؤول ✓","ok");
-    }else{toast("كلمة المرور غير صحيحة","err");$("adminPass").select();}
+    var pw=$("adminPass").value;
+    if(!pw){toast("أدخل كلمة المرور","err");return;}
+    if(MODE==="local"){
+      if(pw===LOCAL_PASS){ isAdmin=true; try{sessionStorage.setItem(LOCAL_ADMIN,"1");}catch(e){}
+        applyAdminUI(); loadLocal(); close("loginOverlay"); toast("تم تسجيل الدخول كمسؤول ✓","ok"); }
+      else { toast("كلمة المرور غير صحيحة","err"); $("adminPass").select(); }
+      return;
+    }
+    if(!sb){toast("النظام غير مهيّأ بعد","err");return;}
+    var btn=$("doLogin"); btn.disabled=true;
+    sb.auth.signInWithPassword({email:ADMIN_EMAIL, password:pw})
+      .then(function(res){
+        if(res.error){ toast("كلمة المرور غير صحيحة","err"); $("adminPass").select(); }
+        else { close("loginOverlay"); toast("تم تسجيل الدخول كمسؤول ✓","ok"); } })
+      .then(function(){ btn.disabled=false; });
   }
   $("doLogin").addEventListener("click",doLogin);
   $("adminPass").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();doLogin();}});
-  $("logoutBtn").addEventListener("click",function(){isAdmin=false;SS.removeItem(ADMIN_KEY);applyAdminUI();renderAll();toast("تم الخروج من وضع المسؤول","ok");});
+  $("logoutBtn").addEventListener("click",function(){
+    if(MODE==="local"){ isAdmin=false; try{sessionStorage.removeItem(LOCAL_ADMIN);}catch(e){} applyAdminUI(); loadLocal(); toast("تم الخروج من وضع المسؤول","ok"); return; }
+    if(sb) sb.auth.signOut();
+  });
 
   document.querySelectorAll("[data-close]").forEach(function(b){b.addEventListener("click",closeAll);});
   document.querySelectorAll(".overlay").forEach(function(o){o.addEventListener("click",function(e){if(e.target===o)closeAll();});});
   document.addEventListener("keydown",function(e){if(e.key==="Escape")closeAll();});
 
-  /* init */
-  applyAdminUI();
-  renderAll();
+  /* ===== ربط Supabase ومزامنة لحظية ===== */
+  var configured=false, detailsChannel=null;
+  try{ configured = !!(SUPABASE_URL && SUPABASE_ANON
+        && SUPABASE_URL.indexOf("ضع_")!==0 && SUPABASE_ANON.indexOf("ضع_")!==0); }catch(e){ configured=false; }
+
+  function loadDays(){
+    sb.from("days").select("date,status").then(function(res){
+      dayMap={};
+      if(!res.error && res.data) res.data.forEach(function(r){ dayMap[r.date]={status:r.status}; });
+      rebuildBookings(); renderAll();
+    });
+  }
+  function loadDetails(){
+    sb.from("details").select("date,name,phone,count,note").then(function(res){
+      detailMap={};
+      if(!res.error && res.data) res.data.forEach(function(r){ detailMap[r.date]={name:r.name,phone:r.phone,count:r.count,note:r.note}; });
+      rebuildBookings(); renderAll();
+    });
+  }
+  function clearDetails(){ detailMap={}; rebuildBookings(); renderAll(); }
+  function ensureDetailsChannel(){
+    if(detailsChannel) return;
+    detailsChannel = sb.channel("details-changes")
+      .on("postgres_changes",{event:"*",schema:"public",table:"details"},function(){ if(isAdmin) loadDetails(); })
+      .subscribe();
+  }
+
+  if(!configured){
+    MODE="local";
+    try{ isAdmin = sessionStorage.getItem(LOCAL_ADMIN)==="1"; }catch(e){ isAdmin=false; }
+    applyAdminUI(); loadLocal();
+  }else{
+    MODE="cloud";
+    sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    sb.channel("days-changes")
+      .on("postgres_changes",{event:"*",schema:"public",table:"days"},function(){ loadDays(); })
+      .subscribe();
+    sb.auth.onAuthStateChange(function(_evt, session){
+      isAdmin = !!(session && session.user && session.user.email===ADMIN_EMAIL);
+      applyAdminUI();
+      if(isAdmin){ loadDetails(); ensureDetailsChannel(); } else { clearDetails(); }
+    });
+    loadDays();
+  }
 })();
 </script>
 </body>
