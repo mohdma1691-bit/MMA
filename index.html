@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>مجلس الدعيلج — حجز الاستراحة</title>
+<title>مجلس الدعيلج — حجز المجلس</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -61,6 +61,16 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
 .card .num{font-size:40px;font-weight:900;color:var(--navy);line-height:1}
 .card .cap{font-size:16px;color:var(--muted);font-weight:700;margin-top:9px}
 .card.accent .num{color:var(--red)}
+.card[role="button"]:hover{transform:translateY(-3px);box-shadow:0 10px 22px rgba(201,162,39,.22);border-color:var(--gold-soft)}
+.card[role="button"]:active{transform:scale(.98)}
+
+.founders-modal{max-width:640px}
+.founders-sub{text-align:center;color:var(--muted);font-size:15px;font-weight:600;margin-bottom:6px}
+.founders-divider{height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:14px 0 18px}
+.founders-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:10px 18px;counter-reset:founder}
+.founders-list li{counter-increment:founder;display:flex;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:15.5px;font-weight:700;color:var(--ink)}
+.founders-list li::before{content:counter(founder);flex:none;width:26px;height:26px;border-radius:50%;background:linear-gradient(145deg,#efd886,var(--gold) 60%,#a8821a);color:var(--navy);font-size:13px;font-weight:900;display:grid;place-items:center;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+@media(max-width:560px){.founders-list{grid-template-columns:1fr}}
 
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:24px;margin-bottom:26px}
 .panel.admin-only{display:none;border:2px solid var(--gold)}
@@ -135,7 +145,6 @@ tbody tr:hover{background:#faf9f4}
 .btn-reject{background:var(--red-bg);color:var(--red);border-color:var(--red-line)}
 .btn-reject:hover{background:var(--red);color:#fff}
 
-/* admin request cards */
 .req-list{display:grid;gap:14px}
 .req-card{border:1px solid var(--amber-line);background:var(--amber-bg);border-radius:var(--r-sm);padding:18px 20px}
 .req-card .rc-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:12px}
@@ -172,7 +181,6 @@ tbody tr:hover{background:#faf9f4}
 .privacy-note svg{width:22px;height:22px;flex:none;margin-top:1px}
 .pin-lock{width:62px;height:62px;border-radius:50%;background:var(--amber-bg);border:1px solid var(--amber-line);display:grid;place-items:center;margin:4px auto 16px}
 .pin-lock svg{width:30px;height:30px}
-.pin-input{text-align:center;letter-spacing:14px;font-size:26px!important;font-weight:800;padding-right:14px!important}
 .modal-actions{display:flex;gap:10px;margin-top:6px}
 .btn{flex:1;padding:15px;border-radius:11px;font-family:inherit;font-weight:800;font-size:18px;cursor:pointer;border:none;transition:.15s}
 .btn-primary{background:var(--navy);color:#fff}.btn-primary:hover{background:var(--navy-700)}
@@ -245,7 +253,6 @@ tbody tr:hover{background:#faf9f4}
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
-<!-- Supabase JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -262,7 +269,7 @@ tbody tr:hover{background:#faf9f4}
       </div>
       <div class="brand-text">
         <h1>مجلس الدعيلج</h1>
-        <div class="brand-flourish"><span class="fl"></span><p>نظام حجز الاستراحة</p><span class="fl"></span></div>
+        <div class="brand-flourish"><span class="fl"></span><p>نظام حجز المجلس</p><span class="fl"></span></div>
       </div>
     </div>
     <div class="date-card">
@@ -285,13 +292,10 @@ tbody tr:hover{background:#faf9f4}
 <div class="container">
 
   <div class="cards">
-    <div class="card"><div class="num">54</div><div class="cap">عدد الأعضاء</div></div>
-    <div class="card"><div class="num">20</div><div class="cap">المؤسسون</div></div>
-    <div class="card"><div class="num">34</div><div class="cap">الداعمون</div></div>
-    <div class="card accent"><div class="num" id="confirmedCount">0</div><div class="cap">الأيام المحجوزة</div></div>
+    <div class="card" id="foundersCard" style="cursor:pointer" role="button" tabindex="0" aria-label="عرض أسماء الأعضاء المؤسسين"><div class="num">54</div><div class="cap">المؤسسون</div></div>
+    <div class="card"><div class="num">0</div><div class="cap">الداعمون</div></div>
   </div>
 
-  <!-- Admin inbox -->
   <div class="panel admin-only" id="inboxPanel">
     <div class="panel-head">
       <h2><span class="bar"></span>طلبات بانتظار الموافقة <span class="badge" id="pendingBadge">0</span></h2>
@@ -299,7 +303,6 @@ tbody tr:hover{background:#faf9f4}
     <div class="req-list" id="reqList"></div>
   </div>
 
-  <!-- Calendar -->
   <div class="panel">
     <div class="panel-head">
       <h2><span class="bar"></span>تقويم الحجوزات</h2>
@@ -324,7 +327,6 @@ tbody tr:hover{background:#faf9f4}
     <div class="days" id="daysGrid"></div>
   </div>
 
-  <!-- Status table -->
   <div class="panel">
     <div class="panel-head"><h2><span class="bar"></span>سجل الحجوزات</h2></div>
     <div class="table-wrap">
@@ -337,7 +339,6 @@ tbody tr:hover{background:#faf9f4}
 
 </div>
 
-<!-- Request modal -->
 <div class="overlay" id="reqOverlay">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reqTitle">
     <div class="modal-head">
@@ -373,7 +374,6 @@ tbody tr:hover{background:#faf9f4}
   </div>
 </div>
 
-<!-- Public info modal -->
 <div class="overlay" id="infoOverlay">
   <div class="modal" role="dialog" aria-modal="true" style="max-width:380px">
     <div class="modal-head"><div class="mt">حالة اليوم</div><button class="x" data-close>×</button></div>
@@ -383,7 +383,6 @@ tbody tr:hover{background:#faf9f4}
   </div>
 </div>
 
-<!-- Admin manage modal -->
 <div class="overlay" id="manageOverlay">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="manageTitle">
     <div class="modal-head">
@@ -396,7 +395,6 @@ tbody tr:hover{background:#faf9f4}
   </div>
 </div>
 
-<!-- Admin login modal -->
 <div class="overlay" id="loginOverlay">
   <div class="modal" role="dialog" aria-modal="true" style="max-width:380px">
     <div class="modal-head">
@@ -408,8 +406,12 @@ tbody tr:hover{background:#faf9f4}
         <svg viewBox="0 0 24 24" fill="none" stroke="#c9a227" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       </div>
       <div class="field">
-        <label for="adminPass" style="text-align:center">الرقم السري</label>
-        <input type="password" id="adminPass" class="pin-input" placeholder="••••" autocomplete="off" inputmode="numeric" maxlength="12">
+        <label for="adminEmail">البريد الإلكتروني</label>
+        <input type="email" id="adminEmail" placeholder="admin@majlis.app" autocomplete="off" value="admin@majlis.app">
+      </div>
+      <div class="field">
+        <label for="adminPass">كلمة المرور</label>
+        <input type="password" id="adminPass" placeholder="كلمة المرور" autocomplete="off">
       </div>
       <div class="modal-actions">
         <button class="btn btn-primary" id="doLogin">دخول</button>
@@ -419,7 +421,6 @@ tbody tr:hover{background:#faf9f4}
   </div>
 </div>
 
-<!-- Confirm modal -->
 <div class="overlay" id="confirmOverlay">
   <div class="modal" role="dialog" aria-modal="true" style="max-width:380px">
     <div class="modal-head"><div class="mt" id="confirmTitle">تأكيد</div></div>
@@ -433,39 +434,30 @@ tbody tr:hover{background:#faf9f4}
   </div>
 </div>
 
+<div class="overlay" id="foundersOverlay">
+  <div class="modal founders-modal" role="dialog" aria-modal="true" aria-labelledby="foundersTitle">
+    <div class="modal-head">
+      <div><div class="mt" id="foundersTitle">الأعضاء المؤسسون</div><div class="md">مجلس الدعيلج — قرية بطحاوين</div></div>
+      <button class="x" data-close>×</button>
+    </div>
+    <div class="modal-body">
+      <div class="founders-sub">تقديراً وعرفاناً لجهودهم في تأسيس هذا المجلس المبارك</div>
+      <div class="founders-divider"></div>
+      <ul class="founders-list" id="foundersList"></ul>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
 (function(){
   "use strict";
 
-  /* ============================================================
-     إعداد Supabase  —  اتبع ملف SETUP-AR.md خطوة بخطوة
-     1) أنشئ مشروعًا مجانيًا: https://supabase.com  (تسجيل بالبريد أو GitHub)
-     2) SQL Editor: الصق محتوى supabase-setup.sql ونفّذه (Run)
-     3) Authentication → Users → Add user: أنشئ حساب المسؤول
-     4) ضع بريد المسؤول في ADMIN_EMAIL (نفسه داخل ملف SQL)
-     5) Project Settings → API: انسخ URL و anon key بالأسفل
-     ============================================================ */
-  var ADMIN_EMAIL   = "admin@majlis.app";          // بريد حساب المسؤول
-  var SUPABASE_URL  = "ضع_Project_URL_هنا";        // مثل: https://xxxxx.supabase.co
-  var SUPABASE_ANON = "ضع_anon_public_key_هنا";    // مفتاح anon العام (آمن في الصفحة)
-  /* ============================================================ */
+  var ADMIN_EMAIL   = "admin@majlis.app";
+  var SUPABASE_URL  = "https://dztsmwvlnintoukmflao.supabase.co";
+  var SUPABASE_ANON = "sb_publishable_AmTY0YyKxucjEEL3TwU7TA_WObQflBu";
   var sb = null;
-  var MODE = "local";   // يُضبط تلقائيًا: local عند غياب المفاتيح، cloud عند وجودها
-
-  /* ===== الوضع المحلي: يعمل فور التحميل بلا إعداد (هذا الجهاز فقط) ===== */
-  var LOCAL_PASS  = "1234";              // كلمة مرور المسؤول في الوضع المحلي فقط — غيّرها إن شئت
-  var LOCAL_KEY   = "majlis_local_v1";
-  var LOCAL_ADMIN = "majlis_local_admin";
-  function lsGet(){ try{ return JSON.parse(localStorage.getItem(LOCAL_KEY))||{}; }catch(e){ return {}; } }
-  function lsSet(o){ try{ localStorage.setItem(LOCAL_KEY, JSON.stringify(o)); }catch(e){} }
-  function loadLocal(){
-    var d=lsGet(); dayMap={}; detailMap={};
-    for(var k in d){ dayMap[k]={status:d[k].status};
-      detailMap[k]={name:d[k].name,phone:d[k].phone,count:d[k].count,note:d[k].note}; }
-    rebuildBookings(); renderAll();
-  }
 
   function pad(n){return n<10?"0"+n:""+n;}
   function iso(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());}
@@ -473,9 +465,7 @@ tbody tr:hover{background:#faf9f4}
 
   var AR_WEEK=["الأحد","الإثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
   var HIJRI_MONTHS=["محرم","صفر","ربيع الأول","ربيع الآخر","جمادى الأولى","جمادى الآخرة","رجب","شعبان","رمضان","شوال","ذو القعدة","ذو الحجة"];
-  /* ========= محرّك تقويم أم القرى (بدون الاعتماد على Intl لضمان العمل في سفاري وكل المتصفحات) ========= */
   var UQ_MIN=1428;
-  /* لكل سنة هجرية: [أطوال الأشهر كبتات, سنة ميلادية, شهر, يوم] ليوم 1 محرم — مستخرجة من تقويم أم القرى الرسمي */
   var UQ=[3529,2007,1,20,3474,2008,1,10,2726,2008,12,29,2390,2009,12,18,686,2010,12,7,1389,2011,11,26,874,2012,11,15,2901,2013,11,4,2730,2014,10,25,2381,2015,10,14,1181,2016,10,2,2397,2017,9,21,698,2018,9,11,1461,2019,8,31,1450,2020,8,20,3413,2021,8,9,2714,2022,7,30,2350,2023,7,19,622,2024,7,7,1373,2025,6,26,2778,2026,6,16,1748,2027,6,6,1701,2028,5,25,2855,2029,5,14,2637,2030,5,4,1197,2031,4,23,1389,2032,4,11,2906,2033,4,1,1876,2034,3,22,3913,2035,3,11,3730,2036,2,29,3366,2037,2,17,2646,2038,2,6,854,2039,1,26,1717,2040,1,15,2986,2041,1,4,2962,2041,12,25,2853,2042,12,14,1675,2043,12,3,2715,2044,11,21,1370,2045,11,11,2778,2046,10,31,1460,2047,10,21,3497,2048,10,9,2898,2049,9,29,2714,2050,9,18,1334,2051,9,7,630,2052,8,26,1397,2053,8,15,2802,2054,8,5,1748,2055,7,26,1705,2056,7,14,1365,2057,7,3,685,2058,6,22,1213,2059,6,11,2490,2060,5,31,1396,2061,5,21,2921,2062,5,10,2898,2063,4,30,2709,2064,4,18,1325,2065,4,7,2653,2066,3,27,1242,2067,3,17,2777,2068,3,5,1714,2069,2,23,3733,2070,2,12,3626,2071,2,2,3222,2072,1,22,2350,2073,1,10,2733,2073,12,30,1386,2074,12,20,3429,2075,12,9,3402,2076,11,28];
   function g2jdn(y,m,d){var a=Math.floor((14-m)/12),yy=y+4800-a,mm=m+12*a-3;return d+Math.floor((153*mm+2)/5)+365*yy+Math.floor(yy/4)-Math.floor(yy/100)+Math.floor(yy/400)-32045;}
   function jdn2gDate(j){var a=j+32044,b=Math.floor((4*a+3)/146097),c=a-Math.floor(146097*b/4);var d2=Math.floor((4*c+3)/1461),e=c-Math.floor(1461*d2/4),m2=Math.floor((5*e+2)/153);var day=e-Math.floor((153*m2+2)/5)+1,month=m2+3-12*Math.floor(m2/10),year=100*b+d2-4800+Math.floor(m2/10);return new Date(year,month-1,day);}
@@ -498,21 +488,13 @@ tbody tr:hover{background:#faf9f4}
     for(var k=1;k<hm;k++) off+=29+((flags>>(k-1))&1);
     return jdn2gDate(UQ_ANCH[i]+off);
   }
-  /* ----- تنسيق عربي خالص بدون Intl ----- */
   function arDigits(s){s=String(s);var D="٠١٢٣٤٥٦٧٨٩";return s.replace(/[0-9]/g,function(c){return D.charAt(+c);});}
   var GREG_MONTHS=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
   function fmtGreg(d){return arDigits(d.getDate())+" "+GREG_MONTHS[d.getMonth()]+" "+arDigits(d.getFullYear());}
-  function fmtGregMonthYear(d){return GREG_MONTHS[d.getMonth()]+" "+arDigits(d.getFullYear());}
-  function fmtGregDayMonth(d){return arDigits(d.getDate())+" "+GREG_MONTHS[d.getMonth()];}
   function fmtWeekday(d){return AR_WEEK[d.getDay()];}
   function hijriOf(d){var h=toHijri(d);if(!h)return "";return arDigits(h.d)+" "+HIJRI_MONTHS[h.m-1]+" "+arDigits(h.y)+" هـ";}
-  function hijriDay(d){var h=toHijri(d);return h?arDigits(h.d):"";}
-  /* كائنات بواجهة format() لتوافق بقية الشيفرة */
-  var gregFmt={format:fmtGreg}, weekdayFmt={format:fmtWeekday}, gMonthFmt={format:fmtGregMonthYear}, gDayMonth={format:fmtGregDayMonth};
-  var hijriNum=1; /* محرّك التقويم متوفّر دائماً */
+  var gregFmt={format:fmtGreg}, weekdayFmt={format:fmtWeekday};
 
-
-  /* dayMap عام (الحالة فقط) + detailMap خاص (للمسؤول)؛ bookings دمجهما لدوال العرض */
   var dayMap={}, detailMap={}, bookings={};
   function rebuildBookings(){
     bookings={};
@@ -521,9 +503,29 @@ tbody tr:hover{background:#faf9f4}
       bookings[j].name=dt.name; bookings[j].phone=dt.phone; bookings[j].count=dt.count; bookings[j].note=dt.note; } }
   }
 
+  var FOUNDERS = [
+    "إبراهيم بن بشير عتيق الشمري","ابراهيم بن صالح الدعيلج الشمري","بدر بن ظيف الله جازي الشمري",
+    "حبيب بن سليمان جازي الشمري","حمد بن إبراهيم الدعيلج الشمري","حمدان بن خويتم زومان الشمري",
+    "خالد بن صالح الدعيلج الشمري","خالد بن فدغوش مطير الشمري","خلف بن عتيق سراي الشمري",
+    "خويتم بن حمدان خويتم الشمري","خيرالله بن سليمان جازي الشمري","رباح بن مقبل رباح الشمري",
+    "سراي بن مسند سراي الشمري","سعود بن سليمان سراي الشمري","سعود بن مطير عقيل الشمري",
+    "سعيد بن عواد صالح الشمري","صلفيق بن سليمان سراي الشمري","ضبيان بن خويتم زومان الشمري",
+    "عارف بن خميس فالح الشمري","عبدالعزيز بن صالح الدعيلج الشمري","عبدالرحمن بن صالح الدعيلج الشمري",
+    "عبداللطيف بن سالم جازي الشمري","عبدالله بن غضبان سالم الشمري","عبدالمذري بن سهو عقيل الشمري",
+    "عبدالناصر بن سهو عقيل الشمري","عتيق بن مناحي عتيق الشمري","غازي بن مطير عقيل الشمري",
+    "غضبان بن سالم جازي الشمري","فالح بن خميس فالح الشمري","فدغوش بن مطير عقيل الشمري",
+    "فهد بن ظيف الله جازي الشمري","فهد بن مناحي عتيق الشمري","فهيد بن عتيق سراي الشمري",
+    "قبلان بن مناحي عتيق الشمري","كايد بن حسيب خويتم الشمري","مبروك بن ضبيان خويتم الشمري",
+    "محمد بن خالد صالح الدعيلج الشمري","محمد بن صالح الدعيلج الشمري","محمد بن مطير عقيل الشمري",
+    "مرزوق بن مناحي عتيق الشمري","مرضي بن سالم جازي الشمري","مساعد بن حمد الدعيلج الشمري",
+    "مسعد بن عواد صالح الشمري","مسند بن سراي الشمري","مطير بن عقيل رابح الشمري",
+    "معزي بن عقلاء غياض الشمري","مقبل بن مناحي عتيق الشمري","مونس بن سالم جازي الشمري",
+    "ميدان بن حمدان خويتم الشمري","نايف بن جازي عيد الشمري","هديرس بن مناحي عتيق الشمري",
+    "هزاع بن فهيد عتيق الشمري","ياسر بن خالد صالح الدعيلج الشمري","يوسف بن عبدالرحمن الدعيلج الشمري"
+  ];
   var nowInit = new Date();
   var _h0 = toHijri(nowInit) || {y:UQ_MIN, m:1};
-  var hView = {y:_h0.y, m:_h0.m};   // الشهر الهجري المعروض (m: 1-12)
+  var hView = {y:_h0.y, m:_h0.m};
   var isAdmin = false;
   var pendingDate=null, manageDate=null, confirmCb=null;
 
@@ -535,9 +537,7 @@ tbody tr:hover{background:#faf9f4}
   function escapeHtml(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
   function fullDateHtml(d){return (hijriOf(d)||"")+' &nbsp;<span class="g">'+gregFmt.format(d)+' م</span>';}
 
-  /* today chip */
   (function(){var now=new Date();$("todayHijri").textContent=hijriOf(now)||"—";$("todayWeekday").textContent=weekdayFmt.format(now);$("todayGreg").textContent=gregFmt.format(now)+" م";})();
-  /* weekdays */
   (function(){var h="";for(var i=0;i<7;i++){h+='<div'+(i===5?' class="fri"':'')+'>'+AR_WEEK[i]+'</div>';}$("weekdays").innerHTML=h;})();
 
   function hijriMonthLen(hy,hm){ var i=hy-UQ_MIN; if(i<0||i>=UQ_N) return 30; var flags=UQ[i*4]; return 29+((flags>>(hm-1))&1); }
@@ -546,9 +546,8 @@ tbody tr:hover{background:#faf9f4}
     var hy=hView.y, hm=hView.m, today=startOfToday();
     var len=hijriMonthLen(hy,hm);
     var first=gregFromHijri(hy,hm,1);
-    var startPad=first.getDay();                 // 0=الأحد
+    var startPad=first.getDay();
 
-    /* العنوان: هجري أساسي + يوافقه ميلادياً */
     $("calMonth").textContent=HIJRI_MONTHS[hm-1]+" "+arDigits(hy)+" هـ";
     var glast=gregFromHijri(hy,hm,len);
     var gpart=(first.getMonth()===glast.getMonth())
@@ -595,7 +594,6 @@ tbody tr:hover{background:#faf9f4}
   function renderStats(){
     var c=0,p=0;
     for(var k in bookings){if(bookings[k].status==="confirmed")c++;else if(bookings[k].status==="pending")p++;}
-    $("confirmedCount").textContent=c;
     $("pendingBadge").textContent=p;
   }
 
@@ -652,7 +650,6 @@ tbody tr:hover{background:#faf9f4}
 
   function renderAll(){renderCalendar();renderStats();renderTable();if(isAdmin)renderInbox();}
 
-  /* admin mode UI */
   function applyAdminUI(){
     $("inboxPanel").classList.toggle("on",isAdmin);
     $("adminBar").classList.toggle("on",isAdmin);
@@ -662,10 +659,18 @@ tbody tr:hover{background:#faf9f4}
     ic.setAttribute("aria-label", isAdmin? "وضع المسؤول مُفعّل" : "دخول المسؤول");
   }
 
-  /* overlays */
   function open(id){$(id).classList.add("show");}
   function close(id){$(id).classList.remove("show");}
   function closeAll(){document.querySelectorAll(".overlay").forEach(function(o){o.classList.remove("show");});}
+
+  (function(){
+    var html="";
+    for(var i=0;i<FOUNDERS.length;i++){ html+='<li>'+escapeHtml(FOUNDERS[i])+'</li>'; }
+    $("foundersList").innerHTML=html;
+  })();
+  function openFounders(){ open("foundersOverlay"); }
+  $("foundersCard").addEventListener("click",openFounders);
+  $("foundersCard").addEventListener("keydown",function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openFounders(); } });
 
   function openRequest(key){
     pendingDate=key;var d=new Date(key+"T00:00:00");
@@ -712,7 +717,6 @@ tbody tr:hover{background:#faf9f4}
 
   function askConfirm(title,msg,cb){$("confirmTitle").textContent=title;$("confirmMsg").textContent=msg;confirmCb=cb;open("confirmOverlay");}
 
-  /* actions */
   function submitRequest(){
     var name=$("rName").value.trim(),phone=$("rPhone").value.trim();
     var count=$("rCount").value.trim(),note=$("rNote").value.trim();
@@ -721,10 +725,6 @@ tbody tr:hover{background:#faf9f4}
     if(phone.replace(/\D/g,"").length<9){toast("رقم الجوال غير صحيح","err");$("rPhone").focus();return;}
     if(count && (isNaN(count)||Number(count)<1)){toast("عدد الحضور غير صحيح","err");return;}
     if(bookings[pendingDate]){toast("تم حجز هذا اليوم للتو، اختر يوماً آخر","err");close("reqOverlay");renderAll();return;}
-    if(MODE==="local"){
-      var dd=lsGet(); dd[pendingDate]={status:"pending",name:name,phone:phone,count:count,note:note,createdAt:Date.now()};
-      lsSet(dd); loadLocal(); close("reqOverlay"); toast("تم إرسال طلبك، بانتظار موافقة المسؤول ✓","ok"); return;
-    }
     if(!sb){toast("النظام غير مهيّأ بعد، تواصل مع المسؤول","err");return;}
     var sub=$("submitReq"); sub.disabled=true;
     sb.from("days").insert({date:pendingDate, status:"pending"})
@@ -736,20 +736,17 @@ tbody tr:hover{background:#faf9f4}
       .then(function(){ sub.disabled=false; });
   }
   function approve(key){
-    if(MODE==="local"){ var d=lsGet(); if(d[key]){ d[key].status="confirmed"; lsSet(d); loadLocal(); toast("تم اعتماد الحجز ✓","ok"); } return; }
     if(!sb)return;
     sb.from("days").update({status:"confirmed"}).eq("date",key)
       .then(function(res){ res.error?toast("تعذّر الاعتماد","err"):toast("تم اعتماد الحجز ✓","ok"); });
   }
   function decline(key){
-    if(MODE==="local"){ var d=lsGet(); delete d[key]; lsSet(d); loadLocal(); toast("تم تحديث الحالة","ok"); return; }
     if(!sb)return;
     sb.from("details").delete().eq("date",key)
       .then(function(){ return sb.from("days").delete().eq("date",key); })
       .then(function(res){ (res&&res.error)?toast("تعذّر التحديث","err"):toast("تم تحديث الحالة","ok"); });
   }
 
-  /* events */
   daysGrid.addEventListener("click",function(e){
     var cell=e.target.closest(".day");if(!cell)return;
     var key=cell.getAttribute("data-date");if(!key)return;
@@ -775,43 +772,32 @@ tbody tr:hover{background:#faf9f4}
   $("nextM").addEventListener("click",function(){var y=hView.y,m=hView.m+1;if(m>12){m=1;y++;}if(y>UQ_MIN+UQ_N-2)return;hView.y=y;hView.m=m;renderCalendar();});
   $("todayBtn").addEventListener("click",function(){var h=toHijri(new Date());if(h){hView.y=h.y;hView.m=h.m;renderCalendar();}});
 
-  /* admin login/logout */
   $("adminToggle").addEventListener("click",function(){
     if(isAdmin){ var ip=$("inboxPanel"); if(ip) ip.scrollIntoView({behavior:"smooth",block:"start"}); return; }
     $("adminPass").value="";open("loginOverlay");setTimeout(function(){$("adminPass").focus();},80);
   });
   function doLogin(){
+    var email=$("adminEmail").value.trim();
     var pw=$("adminPass").value;
+    if(!email){toast("أدخل البريد الإلكتروني","err");return;}
     if(!pw){toast("أدخل كلمة المرور","err");return;}
-    if(MODE==="local"){
-      if(pw===LOCAL_PASS){ isAdmin=true; try{sessionStorage.setItem(LOCAL_ADMIN,"1");}catch(e){}
-        applyAdminUI(); loadLocal(); close("loginOverlay"); toast("تم تسجيل الدخول كمسؤول ✓","ok"); }
-      else { toast("كلمة المرور غير صحيحة","err"); $("adminPass").select(); }
-      return;
-    }
     if(!sb){toast("النظام غير مهيّأ بعد","err");return;}
     var btn=$("doLogin"); btn.disabled=true;
-    sb.auth.signInWithPassword({email:ADMIN_EMAIL, password:pw})
+    sb.auth.signInWithPassword({email:email, password:pw})
       .then(function(res){
-        if(res.error){ toast("كلمة المرور غير صحيحة","err"); $("adminPass").select(); }
+        if(res.error){ toast("بيانات الدخول غير صحيحة","err"); $("adminPass").select(); }
         else { close("loginOverlay"); toast("تم تسجيل الدخول كمسؤول ✓","ok"); } })
       .then(function(){ btn.disabled=false; });
   }
   $("doLogin").addEventListener("click",doLogin);
   $("adminPass").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();doLogin();}});
-  $("logoutBtn").addEventListener("click",function(){
-    if(MODE==="local"){ isAdmin=false; try{sessionStorage.removeItem(LOCAL_ADMIN);}catch(e){} applyAdminUI(); loadLocal(); toast("تم الخروج من وضع المسؤول","ok"); return; }
-    if(sb) sb.auth.signOut();
-  });
+  $("logoutBtn").addEventListener("click",function(){ if(sb) sb.auth.signOut(); });
 
   document.querySelectorAll("[data-close]").forEach(function(b){b.addEventListener("click",closeAll);});
   document.querySelectorAll(".overlay").forEach(function(o){o.addEventListener("click",function(e){if(e.target===o)closeAll();});});
   document.addEventListener("keydown",function(e){if(e.key==="Escape")closeAll();});
 
-  /* ===== ربط Supabase ومزامنة لحظية ===== */
-  var configured=false, detailsChannel=null;
-  try{ configured = !!(SUPABASE_URL && SUPABASE_ANON
-        && SUPABASE_URL.indexOf("ضع_")!==0 && SUPABASE_ANON.indexOf("ضع_")!==0); }catch(e){ configured=false; }
+  var detailsChannel = null;
 
   function loadDays(){
     sb.from("days").select("date,status").then(function(res){
@@ -835,23 +821,16 @@ tbody tr:hover{background:#faf9f4}
       .subscribe();
   }
 
-  if(!configured){
-    MODE="local";
-    try{ isAdmin = sessionStorage.getItem(LOCAL_ADMIN)==="1"; }catch(e){ isAdmin=false; }
-    applyAdminUI(); loadLocal();
-  }else{
-    MODE="cloud";
-    sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-    sb.channel("days-changes")
-      .on("postgres_changes",{event:"*",schema:"public",table:"days"},function(){ loadDays(); })
-      .subscribe();
-    sb.auth.onAuthStateChange(function(_evt, session){
-      isAdmin = !!(session && session.user && session.user.email===ADMIN_EMAIL);
-      applyAdminUI();
-      if(isAdmin){ loadDetails(); ensureDetailsChannel(); } else { clearDetails(); }
-    });
-    loadDays();
-  }
+  sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  sb.channel("days-changes")
+    .on("postgres_changes",{event:"*",schema:"public",table:"days"},function(){ loadDays(); })
+    .subscribe();
+  sb.auth.onAuthStateChange(function(_evt, session){
+    isAdmin = !!(session && session.user && session.user.email===ADMIN_EMAIL);
+    applyAdminUI();
+    if(isAdmin){ loadDetails(); ensureDetailsChannel(); } else { clearDetails(); }
+  });
+  loadDays();
 })();
 </script>
 </body>
