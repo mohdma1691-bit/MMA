@@ -342,8 +342,8 @@ tbody tr:hover{background:#faf9f4}
         <input type="tel" id="rPhone" placeholder="05xxxxxxxx" autocomplete="off" inputmode="numeric">
       </div>
       <div class="field">
-        <label for="rCount">عدد الحضور المتوقع</label>
-        <input type="number" id="rCount" min="1" placeholder="اختياري">
+        <label for="rCount">نوع المناسبة</label>
+        <input type="text" id="rCount" placeholder="مثال: عزيمة عشاء، اجتماع، مناسبة عائلية">
       </div>
       <div class="field">
         <label for="rNote">ملاحظات</label>
@@ -584,7 +584,7 @@ tbody tr:hover{background:#faf9f4}
     var head=$("logHead"),body=$("logBody");
     var keys=Object.keys(bookings).sort();
     if(isAdmin){
-      head.innerHTML='<tr><th>التاريخ</th><th>اليوم</th><th>الحالة</th><th>الاسم</th><th>الجوال</th><th>الحضور</th><th>إجراء</th></tr>';
+      head.innerHTML='<tr><th>التاريخ</th><th>اليوم</th><th>الحالة</th><th>الاسم</th><th>الجوال</th><th>نوع المناسبة</th><th>إجراء</th></tr>';
     }else{
       head.innerHTML='<tr><th>التاريخ</th><th>اليوم</th><th>الحالة</th></tr>';
     }
@@ -620,7 +620,7 @@ tbody tr:hover{background:#faf9f4}
         '<div class="rc-grid">'+
           '<div class="rc-item"><div class="k">الاسم</div><div class="v">'+escapeHtml(b.name)+'</div></div>'+
           '<div class="rc-item"><div class="k">الجوال</div><div class="v">'+escapeHtml(b.phone)+'</div></div>'+
-          '<div class="rc-item"><div class="k">عدد الحضور</div><div class="v">'+(b.count?escapeHtml(b.count):"—")+'</div></div>'+
+          '<div class="rc-item"><div class="k">نوع المناسبة</div><div class="v">'+(b.count?escapeHtml(b.count):"—")+'</div></div>'+
         '</div>'+
         (b.note?'<div class="rc-note">'+escapeHtml(b.note)+'</div>':'')+
         '<div class="rc-actions">'+
@@ -682,7 +682,7 @@ tbody tr:hover{background:#faf9f4}
     var c='<div class="detail-line"><span class="k">الاسم</span><span class="v">'+escapeHtml(b.name)+'</span></div>'+
           '<div class="detail-line"><span class="k">الجوال</span><span class="v">'+escapeHtml(b.phone)+'</span></div>'+
           '<div class="detail-line"><span class="k">اليوم</span><span class="v">'+weekdayFmt.format(d)+'</span></div>'+
-          '<div class="detail-line"><span class="k">عدد الحضور</span><span class="v">'+(b.count?escapeHtml(b.count):"—")+'</span></div>';
+          '<div class="detail-line"><span class="k">نوع المناسبة</span><span class="v">'+(b.count?escapeHtml(b.count):"—")+'</span></div>';
     if(b.note) c+='<div class="detail-note">'+escapeHtml(b.note)+'</div>';
     $("manageContent").innerHTML=c;
     var acts="";
@@ -706,7 +706,6 @@ tbody tr:hover{background:#faf9f4}
     if(!name){toast("الرجاء إدخال الاسم","err");$("rName").focus();return;}
     if(!phone){toast("الرجاء إدخال رقم الجوال","err");$("rPhone").focus();return;}
     if(phone.replace(/\D/g,"").length<9){toast("رقم الجوال غير صحيح","err");$("rPhone").focus();return;}
-    if(count && (isNaN(count)||Number(count)<1)){toast("عدد الحضور غير صحيح","err");return;}
     if(bookings[pendingDate]){toast("تم حجز هذا اليوم للتو، اختر يوماً آخر","err");close("reqOverlay");renderAll();return;}
     if(!sb){toast("النظام غير مهيّأ بعد، تواصل مع المسؤول","err");return;}
     var sub=$("submitReq"); sub.disabled=true;
