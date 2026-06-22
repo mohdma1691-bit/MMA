@@ -117,13 +117,24 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
 .day.past.confirmed{background:#d8a39d;border-color:#d8a39d;color:#fff}
 .day.past.confirmed .dh,.day.past.confirmed .stt{color:rgba(255,255,255,.75)}
 .day.today{box-shadow:0 0 0 2px var(--gold)}
-.table-wrap{overflow-x:auto;border-radius:var(--r-sm);border:1px solid var(--line)}
-table{width:100%;border-collapse:collapse;background:var(--surface);min-width:420px}
-th,td{padding:15px 14px;text-align:center;border-bottom:1px solid var(--line);font-size:16.5px}
-th{background:var(--navy);color:#fff;font-weight:700;font-size:15.5px}
-tbody tr:last-child td{border-bottom:none}
-tbody tr:hover{background:#faf9f4}
-.empty-row td{color:var(--muted);padding:34px;font-weight:600;font-size:16px}
+
+/* ===== سجل الحجوزات — تصميم بطاقات بدل الجدول ===== */
+.log-list{display:grid;gap:12px}
+.log-card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);padding:16px 20px;box-shadow:var(--shadow-sm);overflow:hidden;transition:.15s}
+.log-card::before{content:"";position:absolute;top:0;bottom:0;right:0;width:5px;background:var(--amber)}
+.log-card.confirmed::before{background:var(--red)}
+.log-card:hover{box-shadow:0 6px 16px rgba(13,27,42,.10);transform:translateY(-1px)}
+.log-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.log-date .wd{font-size:18px;font-weight:900;color:var(--navy);line-height:1.2}
+.log-date .hj{font-size:15px;font-weight:700;color:var(--ink);margin-top:3px}
+.log-date .gr{font-size:13.5px;color:var(--muted);font-weight:600;margin-top:2px}
+.log-details{margin-top:14px;padding-top:14px;border-top:1px dashed var(--line);display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
+.log-details .k{font-size:13px;color:var(--muted);font-weight:700}
+.log-details .v{font-size:16px;color:var(--ink);font-weight:800;margin-top:2px}
+.log-foot{margin-top:14px;display:flex;justify-content:flex-end}
+.log-foot .btn-sm{margin:0}
+.log-empty{text-align:center;color:var(--muted);padding:30px;font-weight:600;font-size:16px;background:var(--surface);border:1px dashed var(--line);border-radius:var(--r-sm)}
+
 .pill{display:inline-block;padding:6px 16px;border-radius:20px;font-size:15px;font-weight:800}
 .pill.confirmed{background:var(--red-bg);color:var(--red)}
 .pill.pending{background:var(--amber-bg);color:var(--amber-ink)}
@@ -228,6 +239,8 @@ tbody tr:hover{background:#faf9f4}
   .modal-head{padding:16px 18px}
   .modal-body{padding:18px}
   .req-card .rc-grid{grid-template-columns:1fr 1fr}
+  .log-card{padding:14px 16px}
+  .log-details{grid-template-columns:1fr 1fr}
 }
 @media(max-width:380px){
   .day{min-height:82px;padding:4px 2px}
@@ -312,12 +325,7 @@ tbody tr:hover{background:#faf9f4}
 
   <div class="panel">
     <div class="panel-head"><h2><span class="bar"></span>سجل الحجوزات</h2></div>
-    <div class="table-wrap">
-      <table id="logTable">
-        <thead id="logHead"></thead>
-        <tbody id="logBody"></tbody>
-      </table>
-    </div>
+    <div class="log-list" id="logList"></div>
   </div>
 
 </div>
@@ -581,31 +589,36 @@ tbody tr:hover{background:#faf9f4}
   }
 
   function renderTable(){
-    var head=$("logHead"),body=$("logBody");
+    var list=$("logList");
     var keys=Object.keys(bookings).sort();
-    if(isAdmin){
-      head.innerHTML='<tr><th>التاريخ</th><th>اليوم</th><th>الحالة</th><th>الاسم</th><th>الجوال</th><th>نوع المناسبة</th><th>إجراء</th></tr>';
-    }else{
-      head.innerHTML='<tr><th>التاريخ</th><th>اليوم</th><th>الحالة</th></tr>';
-    }
     if(keys.length===0){
-      body.innerHTML='<tr class="empty-row"><td colspan="'+(isAdmin?7:3)+'">لا توجد حجوزات حتى الآن.</td></tr>';
+      list.innerHTML='<div class="log-empty">لا توجد حجوزات حتى الآن.</div>';
       return;
     }
     var html="";
     keys.forEach(function(k){
-      var b=bookings[k],d=new Date(k+"T00:00:00");
-      var pill='<span class="pill '+b.status+'">'+(b.status==="confirmed"?"محجوز":"قيد المراجعة")+'</span>';
-      var dateCell=(hijriOf(d)||gregFmt.format(d))+'<br><span style="font-size:11px;color:var(--muted)">'+gregFmt.format(d)+' م</span>';
+      var b=bookings[k], d=new Date(k+"T00:00:00");
+      var confirmed=b.status==="confirmed";
+      var pill='<span class="pill '+b.status+'">'+(confirmed?"محجوز":"قيد المراجعة")+'</span>';
+      html+='<div class="log-card '+b.status+'">'+
+        '<div class="log-top">'+
+          '<div class="log-date">'+
+            '<div class="wd">'+weekdayFmt.format(d)+'</div>'+
+            '<div class="hj">'+(hijriOf(d)||"")+'</div>'+
+            '<div class="gr">'+gregFmt.format(d)+' م</div>'+
+          '</div>'+pill+
+        '</div>';
       if(isAdmin){
-        html+='<tr><td>'+dateCell+'</td><td>'+weekdayFmt.format(d)+'</td><td>'+pill+'</td>'+
-          '<td><strong>'+escapeHtml(b.name)+'</strong></td><td>'+escapeHtml(b.phone)+'</td><td>'+(b.count?escapeHtml(b.count):"—")+'</td>'+
-          '<td><button class="btn-sm btn-reject" data-manage="'+k+'">إدارة</button></td></tr>';
-      }else{
-        html+='<tr><td>'+dateCell+'</td><td>'+weekdayFmt.format(d)+'</td><td>'+pill+'</td></tr>';
+        html+='<div class="log-details">'+
+            '<div><div class="k">الاسم</div><div class="v">'+escapeHtml(b.name)+'</div></div>'+
+            '<div><div class="k">الجوال</div><div class="v">'+escapeHtml(b.phone)+'</div></div>'+
+            '<div><div class="k">نوع المناسبة</div><div class="v">'+(b.count?escapeHtml(b.count):"—")+'</div></div>'+
+          '</div>'+
+          '<div class="log-foot"><button class="btn-sm btn-reject" data-manage="'+k+'">إدارة</button></div>';
       }
+      html+='</div>';
     });
-    body.innerHTML=html;
+    list.innerHTML=html;
   }
 
   function renderInbox(){
@@ -743,7 +756,7 @@ tbody tr:hover{background:#faf9f4}
     if(a) approve(a.getAttribute("data-approve"));
     else if(r){var k=r.getAttribute("data-decline");askConfirm("رفض الطلب","سيتم رفض هذا الطلب وإعادة اليوم متاحاً. متابعة؟",function(){decline(k);});}
   });
-  $("logBody").addEventListener("click",function(e){var m=e.target.closest("[data-manage]");if(m)openManage(m.getAttribute("data-manage"));});
+  $("logList").addEventListener("click",function(e){var m=e.target.closest("[data-manage]");if(m)openManage(m.getAttribute("data-manage"));});
 
   $("submitReq").addEventListener("click",submitRequest);
   ["rName","rPhone","rCount"].forEach(function(id){$(id).addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();submitRequest();}});});
