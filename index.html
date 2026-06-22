@@ -173,6 +173,12 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
 .field input,.field textarea{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:10px;font-family:inherit;font-size:17px;color:var(--ink);background:#fcfcfa;transition:.15s}
 .field input:focus,.field textarea:focus{outline:none;border-color:var(--gold);background:#fff;box-shadow:0 0 0 3px rgba(201,162,39,.15)}
 .field textarea{resize:vertical;min-height:78px}
+.meal-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.meal-opt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:14px 6px;border:1.5px solid var(--line);border-radius:12px;background:#fcfcfa;color:var(--muted);font-family:inherit;font-size:15.5px;font-weight:800;cursor:pointer;transition:.15s}
+.meal-opt svg{width:24px;height:24px}
+.meal-opt:hover{border-color:var(--gold-soft);background:#fff}
+.meal-opt:active{transform:scale(.97)}
+.meal-opt.active{border-color:var(--gold);background:var(--amber-bg);color:var(--amber-ink);box-shadow:0 0 0 3px rgba(201,162,39,.15)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .privacy-note{background:#eef4fb;border:1px solid #d3e2f3;color:#26466e;border-radius:10px;padding:13px 14px;font-size:14.5px;font-weight:600;margin-bottom:18px;display:flex;gap:9px;align-items:flex-start}
 .privacy-note svg{width:22px;height:22px;flex:none;margin-top:1px}
@@ -350,6 +356,23 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
         <input type="tel" id="rPhone" placeholder="05xxxxxxxx" autocomplete="off" inputmode="numeric">
       </div>
       <div class="field">
+        <label>وقت الوجبة <span class="req">*</span></label>
+        <div class="meal-seg" id="mealSeg" role="group" aria-label="اختيار وقت الوجبة">
+          <button type="button" class="meal-opt" data-meal="غداء">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+            <span>غداء</span>
+          </button>
+          <button type="button" class="meal-opt" data-meal="عشاء">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <span>عشاء</span>
+          </button>
+          <button type="button" class="meal-opt" data-meal="غداء وعشاء">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><circle cx="7" cy="8" r="3"/><path d="M14 6a5 5 0 0 0 4 8"/></svg>
+            <span>كلاهما</span>
+          </button>
+        </div>
+      </div>
+      <div class="field">
         <label for="rCount">نوع المناسبة</label>
         <input type="text" id="rCount" placeholder="مثال: عزيمة عشاء، اجتماع، مناسبة عائلية">
       </div>
@@ -491,7 +514,7 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
     bookings={};
     for(var k in dayMap){ bookings[k]={status:(dayMap[k]&&dayMap[k].status)||"pending"}; }
     for(var j in detailMap){ if(bookings[j]){ var dt=detailMap[j];
-      bookings[j].name=dt.name; bookings[j].phone=dt.phone; bookings[j].count=dt.count; bookings[j].note=dt.note; } }
+      bookings[j].name=dt.name; bookings[j].phone=dt.phone; bookings[j].count=dt.count; bookings[j].note=dt.note; bookings[j].meal=dt.meal; } }
   }
 
   var FOUNDERS = [
@@ -518,7 +541,7 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
   var _h0 = toHijri(nowInit) || {y:UQ_MIN, m:1};
   var hView = {y:_h0.y, m:_h0.m};
   var isAdmin = false;
-  var pendingDate=null, manageDate=null, confirmCb=null;
+  var pendingDate=null, manageDate=null, confirmCb=null, selectedMeal=null;
 
   var $=function(id){return document.getElementById(id);};
   var daysGrid=$("daysGrid");
@@ -612,6 +635,7 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
         html+='<div class="log-details">'+
             '<div><div class="k">الاسم</div><div class="v">'+escapeHtml(b.name)+'</div></div>'+
             '<div><div class="k">الجوال</div><div class="v">'+escapeHtml(b.phone)+'</div></div>'+
+            '<div><div class="k">وقت الوجبة</div><div class="v">'+(b.meal?escapeHtml(b.meal):"—")+'</div></div>'+
             '<div><div class="k">نوع المناسبة</div><div class="v">'+(b.count?escapeHtml(b.count):"—")+'</div></div>'+
           '</div>'+
           '<div class="log-foot"><button class="btn-sm btn-reject" data-manage="'+k+'">إدارة</button></div>';
@@ -633,6 +657,7 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
         '<div class="rc-grid">'+
           '<div class="rc-item"><div class="k">الاسم</div><div class="v">'+escapeHtml(b.name)+'</div></div>'+
           '<div class="rc-item"><div class="k">الجوال</div><div class="v">'+escapeHtml(b.phone)+'</div></div>'+
+          '<div class="rc-item"><div class="k">وقت الوجبة</div><div class="v">'+(b.meal?escapeHtml(b.meal):"—")+'</div></div>'+
           '<div class="rc-item"><div class="k">نوع المناسبة</div><div class="v">'+(b.count?escapeHtml(b.count):"—")+'</div></div>'+
         '</div>'+
         (b.note?'<div class="rc-note">'+escapeHtml(b.note)+'</div>':'')+
@@ -673,6 +698,8 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
     $("reqTitle").textContent="طلب حجز يوم "+weekdayFmt.format(d);
     $("reqDate").innerHTML=fullDateHtml(d);
     $("rName").value="";$("rPhone").value="";$("rCount").value="";$("rNote").value="";
+    selectedMeal=null;
+    document.querySelectorAll("#mealSeg .meal-opt").forEach(function(b){b.classList.remove("active");});
     open("reqOverlay");setTimeout(function(){$("rName").focus();},60);
   }
 
@@ -695,6 +722,7 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
     var c='<div class="detail-line"><span class="k">الاسم</span><span class="v">'+escapeHtml(b.name)+'</span></div>'+
           '<div class="detail-line"><span class="k">الجوال</span><span class="v">'+escapeHtml(b.phone)+'</span></div>'+
           '<div class="detail-line"><span class="k">اليوم</span><span class="v">'+weekdayFmt.format(d)+'</span></div>'+
+          '<div class="detail-line"><span class="k">وقت الوجبة</span><span class="v">'+(b.meal?escapeHtml(b.meal):"—")+'</span></div>'+
           '<div class="detail-line"><span class="k">نوع المناسبة</span><span class="v">'+(b.count?escapeHtml(b.count):"—")+'</span></div>';
     if(b.note) c+='<div class="detail-note">'+escapeHtml(b.note)+'</div>';
     $("manageContent").innerHTML=c;
@@ -719,15 +747,22 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
     if(!name){toast("الرجاء إدخال الاسم","err");$("rName").focus();return;}
     if(!phone){toast("الرجاء إدخال رقم الجوال","err");$("rPhone").focus();return;}
     if(phone.replace(/\D/g,"").length<9){toast("رقم الجوال غير صحيح","err");$("rPhone").focus();return;}
+    if(!selectedMeal){toast("الرجاء اختيار وقت الوجبة","err");return;}
     if(bookings[pendingDate]){toast("تم حجز هذا اليوم للتو، اختر يوماً آخر","err");close("reqOverlay");renderAll();return;}
     if(!sb){toast("النظام غير مهيّأ بعد، تواصل مع المسؤول","err");return;}
     var sub=$("submitReq"); sub.disabled=true;
+    var daysCreated=false;
     sb.from("days").insert({date:pendingDate, status:"pending"})
-      .then(function(res){ if(res.error) throw res.error;
-        return sb.from("details").insert({date:pendingDate, name:name, phone:phone, count:count, note:note}); })
+      .then(function(res){ if(res.error) throw res.error; daysCreated=true;
+        return sb.from("details").insert({date:pendingDate, name:name, phone:phone, count:count, note:note, meal:selectedMeal}); })
       .then(function(res){ if(res && res.error) throw res.error;
         close("reqOverlay"); toast("تم إرسال طلبك، بانتظار موافقة المسؤول ✓","ok"); })
-      .catch(function(e){ toast("تعذّر الإرسال — قد يكون اليوم حُجز للتو أو هناك خلل بالاتصال","err"); })
+      .catch(function(e){
+        if(daysCreated){ sb.from("days").delete().eq("date",pendingDate); }
+        var m=(e&&e.message)?e.message:"خلل بالاتصال";
+        toast("تعذّر حفظ الطلب: "+m,"err");
+        if(window.console&&console.error) console.error("submitRequest:",e);
+      })
       .then(function(){ sub.disabled=false; });
   }
   function approve(key){
@@ -759,6 +794,11 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
   $("logList").addEventListener("click",function(e){var m=e.target.closest("[data-manage]");if(m)openManage(m.getAttribute("data-manage"));});
 
   $("submitReq").addEventListener("click",submitRequest);
+  $("mealSeg").addEventListener("click",function(e){
+    var btn=e.target.closest(".meal-opt"); if(!btn) return;
+    selectedMeal=btn.getAttribute("data-meal");
+    document.querySelectorAll("#mealSeg .meal-opt").forEach(function(b){b.classList.toggle("active",b===btn);});
+  });
   ["rName","rPhone","rCount"].forEach(function(id){$(id).addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();submitRequest();}});});
 
   $("confirmYes").addEventListener("click",function(){close("confirmOverlay");if(confirmCb){confirmCb();confirmCb=null;}});
@@ -802,9 +842,9 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
     });
   }
   function loadDetails(){
-    sb.from("details").select("date,name,phone,count,note").then(function(res){
+    sb.from("details").select("date,name,phone,count,note,meal").then(function(res){
       detailMap={};
-      if(!res.error && res.data) res.data.forEach(function(r){ detailMap[r.date]={name:r.name,phone:r.phone,count:r.count,note:r.note}; });
+      if(!res.error && res.data) res.data.forEach(function(r){ detailMap[r.date]={name:r.name,phone:r.phone,count:r.count,note:r.note,meal:r.meal}; });
       rebuildBookings(); renderAll();
     });
   }
