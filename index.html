@@ -89,34 +89,31 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
 .cal-hint b{color:#0f5e34}
 .cal-hint .dot{flex:none}
 *{-webkit-tap-highlight-color:transparent}
-.day.available:active,.day.pending:active,.day.confirmed:active{transform:scale(.95)}
+.day.clk:active{transform:scale(.95)}
 .btn:active,.btn-sm:active,.admin-ic:active,.cal-nav button:active{transform:scale(.97)}
 .weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin:6px 0 8px}
 .weekdays div{text-align:center;font-size:16px;font-weight:800;color:var(--muted);padding:7px 0}
 .weekdays div.fri{color:var(--gold)}
 .days{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
-.day{min-height:92px;border-radius:12px;border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:700;position:relative;background:var(--surface);transition:transform .12s,box-shadow .12s;padding:6px 4px;text-align:center}
-.day .dnum{font-size:27px;line-height:1;font-weight:900}
-.day .dh{font-size:13px;color:var(--muted);font-weight:600;margin-top:3px}
-.day .stt{font-size:13px;font-weight:800;margin-top:4px;opacity:.95;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 2px}
-.day .bname{font-size:12px;font-weight:700;margin-top:2px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 2px}
+.day{min-height:102px;border-radius:12px;border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;font-weight:700;position:relative;background:var(--surface);transition:transform .12s,box-shadow .12s;padding:8px 4px 6px;text-align:center}
+.day .dnum{font-size:25px;line-height:1;font-weight:900}
+.day .dh{font-size:12.5px;color:var(--muted);font-weight:600;margin-top:2px}
 .day.empty{border:none;background:transparent}
 .day.fri-col{box-shadow:inset 0 0 0 1px rgba(201,162,39,.22)}
-.day.available{background:var(--green-bg);border-color:var(--green-line);color:#16703f;cursor:pointer}
-.day.available:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(31,157,87,.22);border-color:var(--green)}
-.day.available .stt{color:#2c9a5e}
-.day.pending{background:var(--amber-bg);border-color:var(--amber-line);color:var(--amber-ink);cursor:pointer}
-.day.pending:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(221,138,30,.22)}
-.day.pending .stt{color:var(--amber)}
-.day.pending .dh{color:#b07d33}
-.day.confirmed{background:var(--red);border-color:var(--red);color:#fff;cursor:pointer}
-.day.confirmed:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(192,57,43,.30)}
-.day.confirmed .dh,.day.confirmed .stt{color:rgba(255,255,255,.85)}
-.day.past{background:var(--past-bg);border-color:#e3e6ea;color:var(--past);cursor:not-allowed}
+.day.clk{cursor:pointer}
+.day.clk:hover{transform:translateY(-3px);box-shadow:0 8px 18px rgba(13,27,42,.13);border-color:var(--gold-soft)}
+.day.past{background:var(--past-bg);border-color:#e3e6ea;color:var(--past)}
 .day.past .dh{color:#c2c8cf}
-.day.past.confirmed{background:#d8a39d;border-color:#d8a39d;color:#fff}
-.day.past.confirmed .dh,.day.past.confirmed .stt{color:rgba(255,255,255,.75)}
 .day.today{box-shadow:0 0 0 2px var(--gold)}
+
+/* ===== فترتا اليوم: غداء وعشاء ===== */
+.day .slots{display:flex;flex-direction:column;gap:4px;width:100%;margin-top:6px;padding:0 5px}
+.slot{font-size:12.5px;font-weight:800;border-radius:7px;padding:3px 4px;text-align:center;border:1px solid transparent;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slot.free{background:var(--green-bg);color:#1f8a4c;border-color:var(--green-line)}
+.slot.pending{background:var(--amber-bg);color:var(--amber-ink);border-color:var(--amber-line)}
+.slot.confirmed{background:var(--red);color:#fff;border-color:var(--red)}
+.slot.past{background:#e9ebee;color:var(--past);border-color:#dfe2e6}
+.slot.confirmed.past{background:#d8a39d;border-color:#d8a39d;color:#fff}
 
 /* ===== سجل الحجوزات — تصميم بطاقات بدل الجدول ===== */
 .log-list{display:grid;gap:12px}
@@ -179,6 +176,11 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
 .meal-opt:hover{border-color:var(--gold-soft);background:#fff}
 .meal-opt:active{transform:scale(.97)}
 .meal-opt.active{border-color:var(--gold);background:var(--amber-bg);color:var(--amber-ink);box-shadow:0 0 0 3px rgba(201,162,39,.15)}
+.meal-opt:disabled,.meal-opt.disabled{opacity:.4;cursor:not-allowed;background:#f1f2f4;border-color:var(--line);color:var(--muted);box-shadow:none}
+.meal-opt:disabled:hover,.meal-opt.disabled:hover{background:#f1f2f4;border-color:var(--line);transform:none}
+.meal-opt:disabled span,.meal-opt.disabled span{text-decoration:line-through}
+.taken-hint{font-size:13.5px;color:var(--amber-ink);font-weight:700;margin-top:8px;background:var(--amber-bg);border:1px solid var(--amber-line);border-radius:8px;padding:8px 11px;display:none}
+.taken-hint.on{display:block}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .privacy-note{background:#eef4fb;border:1px solid #d3e2f3;color:#26466e;border-radius:10px;padding:13px 14px;font-size:14.5px;font-weight:600;margin-bottom:18px;display:flex;gap:9px;align-items:flex-start}
 .privacy-note svg{width:22px;height:22px;flex:none;margin-top:1px}
@@ -196,11 +198,16 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
 .info-big .ic svg{width:32px;height:32px}
 .info-big .t{font-size:22px;font-weight:800;color:var(--navy)}
 .info-big .s{font-size:16px;color:var(--muted);margin-top:5px}
-.detail-line{display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px dashed var(--line);font-size:17px}
+.manage-block{border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.manage-block .mb-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.manage-block .mb-top b{color:var(--navy);font-size:18px}
+.detail-line{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px dashed var(--line);font-size:17px}
 .detail-line:last-of-type{border-bottom:none}
 .detail-line .k{color:var(--muted);font-weight:600}
 .detail-line .v{font-weight:800;color:var(--ink)}
 .detail-note{background:#faf9f4;border:1px solid var(--line);border-radius:10px;padding:13px;margin-top:10px;font-size:16px}
+.add-slot{border:1px dashed var(--green-line);background:var(--green-bg);border-radius:12px;padding:14px 16px;text-align:center;margin-bottom:6px}
+.add-slot .as-t{font-weight:800;color:#15703f;margin-bottom:10px;font-size:16px}
 .toast{position:fixed;bottom:26px;right:50%;transform:translate(50%,140%);background:var(--navy);color:#fff;padding:16px 24px;border-radius:12px;font-weight:700;font-size:16.5px;box-shadow:0 12px 30px rgba(0,0,0,.3);z-index:200;transition:transform .35s cubic-bezier(.2,.9,.3,1.2);border-right:5px solid var(--gold);max-width:90vw}
 .toast.show{transform:translate(50%,0)}
 .toast.ok{border-right-color:var(--green)}
@@ -234,11 +241,11 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
   .weekdays div{font-size:14px;padding:4px 0}
   .days{gap:5px}
   .cal-hint{font-size:13.5px;padding:10px 12px}
-  .day{border-radius:10px;padding:5px 3px;min-height:88px}
-  .day .dnum{font-size:23px}
+  .day{border-radius:10px;padding:6px 3px 5px;min-height:96px}
+  .day .dnum{font-size:22px}
   .day .dh{display:none}
-  .day .stt{font-size:11px;margin-top:3px;white-space:normal;line-height:1.15}
-  .day .bname{display:none}
+  .day .slots{gap:3px;margin-top:5px;padding:0 3px}
+  .slot{font-size:10.5px;padding:2px 3px;border-radius:6px}
   .cal-title{min-width:150px}
   .cal-title .m{font-size:19px}
   .cal-nav button{width:42px;height:42px;font-size:22px}
@@ -249,9 +256,9 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
   .log-details{grid-template-columns:1fr 1fr}
 }
 @media(max-width:380px){
-  .day{min-height:82px;padding:4px 2px}
-  .day .stt{font-size:10.5px}
-  .day .dnum{font-size:21px}
+  .day{min-height:90px;padding:5px 2px 4px}
+  .slot{font-size:10px}
+  .day .dnum{font-size:20px}
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -324,7 +331,7 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
       </div>
       <button class="btn-sm" style="background:#eef0f2;color:var(--navy);border-color:var(--line)" id="todayBtn">العودة لهذا الشهر</button>
     </div>
-    <div class="cal-hint"><i class="dot av"></i> اضغط على أي يوم <b>باللون الأخضر</b> لتقديم طلب حجز</div>
+    <div class="cal-hint"><i class="dot av"></i> كل يوم فيه فترتان: <b>غداء</b> و<b>عشاء</b> — اضغط على اليوم لحجز الفترة المتاحة</div>
     <div class="weekdays" id="weekdays"></div>
     <div class="days" id="daysGrid"></div>
   </div>
@@ -345,7 +352,7 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
     <div class="modal-body">
       <div class="privacy-note">
         <svg viewBox="0 0 24 24" fill="none" stroke="#264a72" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <span>بياناتك (الاسم والجوال) تصل إلى المسؤول فقط ولا تظهر لأي مستخدم آخر. سيظهر اليوم للجميع كـ«محجوز» دون أي تفاصيل.</span>
+        <span>بياناتك (الاسم والجوال) تصل إلى المسؤول فقط ولا تظهر لأي مستخدم آخر. ستظهر الفترة للجميع كـ«محجوزة» دون أي تفاصيل.</span>
       </div>
       <div class="field">
         <label for="rName">الاسم <span class="req">*</span></label>
@@ -371,6 +378,7 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
             <span>كلاهما</span>
           </button>
         </div>
+        <div class="taken-hint" id="takenHint"></div>
       </div>
       <div class="field">
         <label for="rCount">نوع المناسبة</label>
@@ -509,12 +517,50 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
   function hijriOf(d){var h=toHijri(d);if(!h)return "";return arDigits(h.d)+" "+HIJRI_MONTHS[h.m-1]+" "+arDigits(h.y)+" هـ";}
   var gregFmt={format:fmtGreg}, weekdayFmt={format:fmtWeekday};
 
+  // ===== نموذج البيانات: كل حجز مفتاحه (التاريخ + الوجبة) =====
+  var SEP="|";
+  var MEAL_LUNCH="غداء", MEAL_DINNER="عشاء", MEAL_BOTH="غداء وعشاء";
+  function ck(date,meal){ return date+SEP+meal; }
+  function parseCk(k){ var i=k.indexOf(SEP); return {date:k.slice(0,i), meal:k.slice(i+1)}; }
+  function mealRank(m){ return m===MEAL_LUNCH?0:(m===MEAL_DINNER?1:2); }
+  function mealSlots(meal){
+    if(meal===MEAL_LUNCH) return ["lunch"];
+    if(meal===MEAL_DINNER) return ["dinner"];
+    if(meal===MEAL_BOTH) return ["lunch","dinner"];
+    return [];
+  }
+
   var dayMap={}, detailMap={}, bookings={};
+
   function rebuildBookings(){
     bookings={};
-    for(var k in dayMap){ bookings[k]={status:(dayMap[k]&&dayMap[k].status)||"pending"}; }
+    for(var k in dayMap){ var dd=dayMap[k]; bookings[k]={date:dd.date, meal:dd.meal, status:(dd.status||"pending")}; }
     for(var j in detailMap){ if(bookings[j]){ var dt=detailMap[j];
-      bookings[j].name=dt.name; bookings[j].phone=dt.phone; bookings[j].count=dt.count; bookings[j].note=dt.note; bookings[j].meal=dt.meal; } }
+      bookings[j].name=dt.name; bookings[j].phone=dt.phone; bookings[j].count=dt.count; bookings[j].note=dt.note; } }
+  }
+  function slotsTaken(dateKey){
+    var t={lunch:false,dinner:false};
+    for(var k in bookings){ var b=bookings[k]; if(b.date!==dateKey) continue;
+      var s=mealSlots(b.meal);
+      if(s.indexOf("lunch")>=0) t.lunch=true;
+      if(s.indexOf("dinner")>=0) t.dinner=true; }
+    return t;
+  }
+  function slotState(dateKey,slot){
+    for(var k in bookings){ var b=bookings[k]; if(b.date!==dateKey) continue;
+      if(mealSlots(b.meal).indexOf(slot)>=0) return {key:k,status:b.status,name:b.name,meal:b.meal}; }
+    return null;
+  }
+  function mealAvailable(dateKey,meal){
+    var t=slotsTaken(dateKey), need=mealSlots(meal);
+    for(var i=0;i<need.length;i++){ if(t[need[i]]) return false; }
+    return true;
+  }
+  function bookingsOnDate(dateKey){
+    var arr=[];
+    for(var k in bookings){ if(bookings[k].date===dateKey) arr.push(k); }
+    arr.sort(function(a,b){ return mealRank(bookings[a].meal)-mealRank(bookings[b].meal); });
+    return arr;
   }
 
   var FOUNDERS = [
@@ -572,61 +618,78 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
       : (arDigits(first.getFullYear())+"/"+arDigits(glast.getFullYear()));
     $("calHijri").textContent="يوافق "+gpart+" "+gyear+" م";
 
+    function chip(label,st,isPast){
+      var cls="slot";
+      if(!st){ cls+=isPast?" past":" free"; }
+      else if(st.status==="confirmed"){ cls+=" confirmed"+(isPast?" past":""); }
+      else { cls+=" pending"; }
+      return '<span class="'+cls+'">'+label+'</span>';
+    }
+
     var html="";
     for(var i=0;i<startPad;i++){html+='<div class="day empty"></div>';}
     for(var d=1;d<=len;d++){
       var gd=gregFromHijri(hy,hm,d);
       var key=iso(gd);
       var isFri=gd.getDay()===5, isToday=gd.getTime()===today.getTime(), isPast=gd<today;
-      var bk=bookings[key];
       var gLabel = arDigits(gd.getDate())+(gd.getDate()===1 ? " "+GREG_MONTHS[gd.getMonth()] : "");
-      var cls="day"+(isFri?" fri-col":"")+(isToday?" today":"");
-      var inner='<span class="dnum">'+arDigits(d)+'</span><span class="dh">'+gLabel+'</span>';
 
-      if(bk && bk.status==="confirmed"){
-        cls+=" confirmed"+(isPast?" past":"");
-        inner+='<span class="stt">محجوز</span>';
-        if(isAdmin) inner+='<span class="bname">'+escapeHtml(bk.name)+'</span>';
-        html+='<div class="'+cls+'" data-date="'+key+'" data-act="manage" tabindex="0" role="button" aria-label="محجوز">'+inner+'</div>';
-      }else if(bk && bk.status==="pending"){
-        cls+=" pending";
-        inner+='<span class="stt">قيد المراجعة</span>';
-        if(isAdmin) inner+='<span class="bname" style="color:var(--amber-ink)">'+escapeHtml(bk.name)+'</span>';
-        html+='<div class="'+cls+'" data-date="'+key+'" data-act="manage" tabindex="0" role="button" aria-label="قيد المراجعة">'+inner+'</div>';
-      }else if(isPast){
-        cls+=" past";
-        html+='<div class="'+cls+'" aria-label="منتهٍ">'+inner+'</div>';
+      var ls=slotState(key,"lunch"), ds=slotState(key,"dinner");
+      var anyBooked=!!(ls||ds), anyFree=!(ls&&ds);
+
+      var cls="day"+(isFri?" fri-col":"")+(isToday?" today":"")+(isPast?" past":"");
+      var clickable=false, dataFree="0", dataBooked=anyBooked?"1":"0";
+
+      if(isPast){
+        if(anyBooked){ clickable=true; dataFree="0"; }
       }else{
-        cls+=" available";
-        inner+='<span class="stt">متاح</span>';
-        html+='<div class="'+cls+'" data-date="'+key+'" data-act="request" tabindex="0" role="button" aria-label="متاح للحجز">'+inner+'</div>';
+        clickable=true;
+        dataFree=anyFree?"1":"0";
+      }
+      if(clickable) cls+=" clk";
+
+      var slotsHtml='<div class="slots">'+chip("غداء",ls,isPast)+chip("عشاء",ds,isPast)+'</div>';
+      var inner='<span class="dnum">'+arDigits(d)+'</span><span class="dh">'+gLabel+'</span>'+slotsHtml;
+
+      if(clickable){
+        html+='<div class="'+cls+'" data-date="'+key+'" data-free="'+dataFree+'" data-booked="'+dataBooked+'" tabindex="0" role="button">'+inner+'</div>';
+      }else{
+        html+='<div class="'+cls+'">'+inner+'</div>';
       }
     }
     daysGrid.innerHTML=html;
   }
 
   function renderStats(){
-    var c=0,p=0;
-    for(var k in bookings){if(bookings[k].status==="confirmed")c++;else if(bookings[k].status==="pending")p++;}
+    var p=0;
+    for(var k in bookings){if(bookings[k].status==="pending")p++;}
     $("pendingBadge").textContent=p;
+  }
+
+  function sortedKeys(){
+    return Object.keys(bookings).sort(function(a,b){
+      var pa=parseCk(a), pb=parseCk(b);
+      if(pa.date!==pb.date) return pa.date<pb.date?-1:1;
+      return mealRank(pa.meal)-mealRank(pb.meal);
+    });
   }
 
   function renderTable(){
     var list=$("logList");
-    var keys=Object.keys(bookings).sort();
+    var keys=sortedKeys();
     if(keys.length===0){
       list.innerHTML='<div class="log-empty">لا توجد حجوزات حتى الآن.</div>';
       return;
     }
     var html="";
     keys.forEach(function(k){
-      var b=bookings[k], d=new Date(k+"T00:00:00");
+      var b=bookings[k], d=new Date(b.date+"T00:00:00");
       var confirmed=b.status==="confirmed";
       var pill='<span class="pill '+b.status+'">'+(confirmed?"محجوز":"قيد المراجعة")+'</span>';
       html+='<div class="log-card '+b.status+'">'+
         '<div class="log-top">'+
           '<div class="log-date">'+
-            '<div class="wd">'+weekdayFmt.format(d)+'</div>'+
+            '<div class="wd">'+weekdayFmt.format(d)+' · '+escapeHtml(b.meal||"")+'</div>'+
             '<div class="hj">'+(hijriOf(d)||"")+'</div>'+
             '<div class="gr">'+gregFmt.format(d)+' م</div>'+
           '</div>'+pill+
@@ -635,10 +698,10 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
         html+='<div class="log-details">'+
             '<div><div class="k">الاسم</div><div class="v">'+escapeHtml(b.name)+'</div></div>'+
             '<div><div class="k">الجوال</div><div class="v">'+escapeHtml(b.phone)+'</div></div>'+
-            '<div><div class="k">وقت الوجبة</div><div class="v">'+(b.meal?escapeHtml(b.meal):"—")+'</div></div>'+
+            '<div><div class="k">الفترة</div><div class="v">'+escapeHtml(b.meal||"—")+'</div></div>'+
             '<div><div class="k">نوع المناسبة</div><div class="v">'+(b.count?escapeHtml(b.count):"—")+'</div></div>'+
           '</div>'+
-          '<div class="log-foot"><button class="btn-sm btn-reject" data-manage="'+k+'">إدارة</button></div>';
+          '<div class="log-foot"><button class="btn-sm btn-reject" data-manage="'+escapeHtml(b.date)+'">إدارة</button></div>';
       }
       html+='</div>';
     });
@@ -647,23 +710,23 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
 
   function renderInbox(){
     var list=$("reqList");
-    var keys=Object.keys(bookings).filter(function(k){return bookings[k].status==="pending";}).sort();
+    var keys=sortedKeys().filter(function(k){return bookings[k].status==="pending";});
     if(keys.length===0){ list.innerHTML='<div class="empty-row" style="text-align:center;color:var(--muted);padding:20px;font-weight:600">لا توجد طلبات معلّقة حالياً.</div>'; return; }
     var html="";
     keys.forEach(function(k){
-      var b=bookings[k],d=new Date(k+"T00:00:00");
+      var b=bookings[k],d=new Date(b.date+"T00:00:00");
       html+='<div class="req-card">'+
         '<div class="rc-top"><div class="rc-date">'+weekdayFmt.format(d)+' — '+(hijriOf(d)||"")+' <span class="g">('+gregFmt.format(d)+' م)</span></div></div>'+
         '<div class="rc-grid">'+
           '<div class="rc-item"><div class="k">الاسم</div><div class="v">'+escapeHtml(b.name)+'</div></div>'+
           '<div class="rc-item"><div class="k">الجوال</div><div class="v">'+escapeHtml(b.phone)+'</div></div>'+
-          '<div class="rc-item"><div class="k">وقت الوجبة</div><div class="v">'+(b.meal?escapeHtml(b.meal):"—")+'</div></div>'+
+          '<div class="rc-item"><div class="k">الفترة</div><div class="v">'+escapeHtml(b.meal||"—")+'</div></div>'+
           '<div class="rc-item"><div class="k">نوع المناسبة</div><div class="v">'+(b.count?escapeHtml(b.count):"—")+'</div></div>'+
         '</div>'+
         (b.note?'<div class="rc-note">'+escapeHtml(b.note)+'</div>':'')+
         '<div class="rc-actions">'+
-          '<button class="btn-sm btn-approve" data-approve="'+k+'">موافقة واعتماد</button>'+
-          '<button class="btn-sm btn-reject" data-decline="'+k+'">رفض</button>'+
+          '<button class="btn-sm btn-approve" data-approve="'+escapeHtml(k)+'">موافقة واعتماد</button>'+
+          '<button class="btn-sm btn-reject" data-decline="'+escapeHtml(k)+'">رفض</button>'+
         '</div></div>';
     });
     list.innerHTML=html;
@@ -693,51 +756,91 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
   $("foundersCard").addEventListener("click",openFounders);
   $("foundersCard").addEventListener("keydown",function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); openFounders(); } });
 
+  function refreshMealOptions(dateKey){
+    var taken=slotsTaken(dateKey);
+    var blockedAny=false;
+    document.querySelectorAll("#mealSeg .meal-opt").forEach(function(b){
+      var need=mealSlots(b.getAttribute("data-meal")), blocked=false;
+      for(var i=0;i<need.length;i++){ if(taken[need[i]]) blocked=true; }
+      b.disabled=blocked; b.classList.toggle("disabled",blocked);
+      if(blocked){ b.classList.remove("active"); blockedAny=true; }
+    });
+    var hint=$("takenHint");
+    if(blockedAny){
+      var msg = (taken.lunch&&taken.dinner) ? "اليوم محجوز بالكامل."
+        : (taken.lunch ? "الغداء محجوز في هذا اليوم — متاح العشاء فقط."
+        : "العشاء محجوز في هذا اليوم — متاح الغداء فقط.");
+      hint.textContent=msg; hint.classList.add("on");
+    }else{ hint.classList.remove("on"); }
+  }
+
   function openRequest(key){
     pendingDate=key;var d=new Date(key+"T00:00:00");
     $("reqTitle").textContent="طلب حجز يوم "+weekdayFmt.format(d);
     $("reqDate").innerHTML=fullDateHtml(d);
     $("rName").value="";$("rPhone").value="";$("rCount").value="";$("rNote").value="";
     selectedMeal=null;
-    document.querySelectorAll("#mealSeg .meal-opt").forEach(function(b){b.classList.remove("active");});
+    refreshMealOptions(key);
     open("reqOverlay");setTimeout(function(){$("rName").focus();},60);
   }
 
   function openInfo(key){
-    var b=bookings[key];if(!b)return;
-    var confirmed=b.status==="confirmed";
-    var icon=confirmed
-      ? '<svg viewBox="0 0 24 24" fill="none" stroke="#c0392b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>'
-      : '<svg viewBox="0 0 24 24" fill="none" stroke="#dd8a1e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
-    $("infoContent").innerHTML='<div class="info-big '+b.status+'"><div class="ic">'+icon+'</div>'+
-      '<div class="t">'+(confirmed?"هذا اليوم محجوز":"هذا اليوم قيد المراجعة")+'</div>'+
-      '<div class="s">'+(confirmed?"تم اعتماد الحجز من المسؤول.":"يوجد طلب حجز بانتظار موافقة المسؤول.")+'</div></div>';
+    var ls=slotState(key,"lunch"), ds=slotState(key,"dinner");
+    if(!ls&&!ds) return;
+    var d=new Date(key+"T00:00:00");
+    function line(label,st){
+      if(!st) return '<div class="detail-line"><span class="k">'+label+'</span><span class="v" style="color:#1f8a4c">متاح</span></div>';
+      var t=st.status==="confirmed"?"محجوز":"قيد المراجعة";
+      var col=st.status==="confirmed"?"var(--red)":"var(--amber-ink)";
+      return '<div class="detail-line"><span class="k">'+label+'</span><span class="v" style="color:'+col+'">'+t+'</span></div>';
+    }
+    var both = (ls&&ls.status==="confirmed")||(ds&&ds.status==="confirmed");
+    $("infoContent").innerHTML=
+      '<div class="info-big '+(both?"confirmed":"pending")+'" style="margin-bottom:6px"><div class="t">حالة هذا اليوم</div><div class="s">'+(hijriOf(d)||"")+'</div></div>'+
+      line("الغداء",ls)+line("العشاء",ds);
     open("infoOverlay");
   }
 
   function openManage(key){
-    manageDate=key;var b=bookings[key];if(!b)return;var d=new Date(key+"T00:00:00");
-    $("manageTitle").textContent = b.status==="confirmed"?"حجز معتمد":"طلب قيد المراجعة";
+    manageDate=key;var d=new Date(key+"T00:00:00");
+    var items=bookingsOnDate(key);
+    $("manageTitle").textContent="إدارة حجوزات اليوم";
     $("manageDate").innerHTML=fullDateHtml(d);
-    var c='<div class="detail-line"><span class="k">الاسم</span><span class="v">'+escapeHtml(b.name)+'</span></div>'+
-          '<div class="detail-line"><span class="k">الجوال</span><span class="v">'+escapeHtml(b.phone)+'</span></div>'+
-          '<div class="detail-line"><span class="k">اليوم</span><span class="v">'+weekdayFmt.format(d)+'</span></div>'+
-          '<div class="detail-line"><span class="k">وقت الوجبة</span><span class="v">'+(b.meal?escapeHtml(b.meal):"—")+'</span></div>'+
-          '<div class="detail-line"><span class="k">نوع المناسبة</span><span class="v">'+(b.count?escapeHtml(b.count):"—")+'</span></div>';
-    if(b.note) c+='<div class="detail-note">'+escapeHtml(b.note)+'</div>';
-    $("manageContent").innerHTML=c;
-    var acts="";
-    if(b.status==="pending"){
-      acts='<button class="btn btn-primary" id="mApprove">موافقة واعتماد</button><button class="btn btn-danger" id="mReject">رفض</button>';
-    }else{
-      acts='<button class="btn btn-danger" id="mCancel">إلغاء الحجز</button><button class="btn btn-ghost" data-close>إغلاق</button>';
+    var c="";
+    if(items.length===0){ c='<p style="color:var(--muted);text-align:center">لا توجد حجوزات في هذا اليوم بعد.</p>'; }
+    items.forEach(function(k){
+      var b=bookings[k];
+      var pill='<span class="pill '+b.status+'">'+(b.status==="confirmed"?"محجوز":"قيد المراجعة")+'</span>';
+      c+='<div class="manage-block">'+
+        '<div class="mb-top"><b>'+escapeHtml(b.meal||"")+'</b>'+pill+'</div>'+
+        '<div class="detail-line"><span class="k">الاسم</span><span class="v">'+escapeHtml(b.name)+'</span></div>'+
+        '<div class="detail-line"><span class="k">الجوال</span><span class="v">'+escapeHtml(b.phone)+'</span></div>'+
+        '<div class="detail-line"><span class="k">نوع المناسبة</span><span class="v">'+(b.count?escapeHtml(b.count):"—")+'</span></div>'+
+        (b.note?'<div class="detail-note">'+escapeHtml(b.note)+'</div>':'')+
+        '<div class="modal-actions" style="margin-top:12px">'+
+          (b.status==="pending"
+            ? '<button class="btn btn-primary" data-mapprove="'+escapeHtml(k)+'">موافقة واعتماد</button><button class="btn btn-danger" data-mreject="'+escapeHtml(k)+'">رفض</button>'
+            : '<button class="btn btn-danger" data-mcancel="'+escapeHtml(k)+'">إلغاء الحجز</button>')+
+        '</div></div>';
+    });
+    var taken=slotsTaken(key), isPast=d<startOfToday();
+    if(!isPast && (!taken.lunch || !taken.dinner)){
+      c+='<div class="add-slot"><div class="as-t">يوجد فترة متاحة في هذا اليوم</div>'+
+         '<div class="modal-actions" style="margin-top:0"><button class="btn btn-ghost" data-add="'+escapeHtml(key)+'">+ إضافة حجز جديد</button></div></div>';
     }
-    $("manageActions").innerHTML=acts;
-    if($("mApprove")) $("mApprove").onclick=function(){approve(key);close("manageOverlay");};
-    if($("mReject"))  $("mReject").onclick=function(){close("manageOverlay");askConfirm("رفض الطلب","سيتم رفض هذا الطلب وإعادة اليوم متاحاً. متابعة؟",function(){decline(key);});};
-    if($("mCancel"))  $("mCancel").onclick=function(){close("manageOverlay");askConfirm("إلغاء الحجز","سيتم إلغاء هذا الحجز المعتمد. متابعة؟",function(){decline(key);});};
+    $("manageContent").innerHTML=c;
+    $("manageActions").innerHTML='<button class="btn btn-ghost" data-close>إغلاق</button>';
     open("manageOverlay");
   }
+
+  $("manageContent").addEventListener("click",function(e){
+    var ap=e.target.closest("[data-mapprove]"), rj=e.target.closest("[data-mreject]"),
+        cn=e.target.closest("[data-mcancel]"), ad=e.target.closest("[data-add]");
+    if(ap){ approve(ap.getAttribute("data-mapprove")); close("manageOverlay"); }
+    else if(rj){ var k=rj.getAttribute("data-mreject"); close("manageOverlay"); askConfirm("رفض الطلب","سيتم رفض هذا الطلب وإعادة الفترة متاحة. متابعة؟",function(){decline(k);}); }
+    else if(cn){ var k2=cn.getAttribute("data-mcancel"); close("manageOverlay"); askConfirm("إلغاء الحجز","سيتم إلغاء هذا الحجز المعتمد وإعادة الفترة متاحة. متابعة؟",function(){decline(k2);}); }
+    else if(ad){ var dt=ad.getAttribute("data-add"); close("manageOverlay"); openRequest(dt); }
+  });
 
   function askConfirm(title,msg,cb){$("confirmTitle").textContent=title;$("confirmMsg").textContent=msg;confirmCb=cb;open("confirmOverlay");}
 
@@ -748,54 +851,60 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
     if(!phone){toast("الرجاء إدخال رقم الجوال","err");$("rPhone").focus();return;}
     if(phone.replace(/\D/g,"").length<9){toast("رقم الجوال غير صحيح","err");$("rPhone").focus();return;}
     if(!selectedMeal){toast("الرجاء اختيار وقت الوجبة","err");return;}
-    if(bookings[pendingDate]){toast("تم حجز هذا اليوم للتو، اختر يوماً آخر","err");close("reqOverlay");renderAll();return;}
+    if(!mealAvailable(pendingDate,selectedMeal)){
+      toast("هذه الفترة محجوزة، اختر فترة أخرى","err");
+      selectedMeal=null; refreshMealOptions(pendingDate); renderAll();
+      return;
+    }
     if(!sb){toast("النظام غير مهيّأ بعد، تواصل مع المسؤول","err");return;}
+    var meal=selectedMeal;
     var sub=$("submitReq"); sub.disabled=true;
     var daysCreated=false;
-    sb.from("days").insert({date:pendingDate, status:"pending"})
+    sb.from("days").insert({date:pendingDate, meal:meal, status:"pending"})
       .then(function(res){ if(res.error) throw res.error; daysCreated=true;
-        return sb.from("details").insert({date:pendingDate, name:name, phone:phone, count:count, note:note, meal:selectedMeal}); })
+        return sb.from("details").insert({date:pendingDate, meal:meal, name:name, phone:phone, count:count, note:note}); })
       .then(function(res){ if(res && res.error) throw res.error;
         close("reqOverlay"); toast("تم إرسال طلبك، بانتظار موافقة المسؤول ✓","ok"); })
       .catch(function(e){
-        if(daysCreated){ sb.from("days").delete().eq("date",pendingDate); }
+        if(daysCreated){ sb.from("days").delete().eq("date",pendingDate).eq("meal",meal); }
         var m=(e&&e.message)?e.message:"خلل بالاتصال";
         toast("تعذّر حفظ الطلب: "+m,"err");
         if(window.console&&console.error) console.error("submitRequest:",e);
       })
       .then(function(){ sub.disabled=false; });
   }
-  function approve(key){
-    if(!sb)return;
-    sb.from("days").update({status:"confirmed"}).eq("date",key)
+  function approve(ckey){
+    if(!sb)return; var p=parseCk(ckey);
+    sb.from("days").update({status:"confirmed"}).eq("date",p.date).eq("meal",p.meal)
       .then(function(res){ res.error?toast("تعذّر الاعتماد","err"):toast("تم اعتماد الحجز ✓","ok"); });
   }
-  function decline(key){
-    if(!sb)return;
-    sb.from("details").delete().eq("date",key)
-      .then(function(){ return sb.from("days").delete().eq("date",key); })
+  function decline(ckey){
+    if(!sb)return; var p=parseCk(ckey);
+    sb.from("details").delete().eq("date",p.date).eq("meal",p.meal)
+      .then(function(){ return sb.from("days").delete().eq("date",p.date).eq("meal",p.meal); })
       .then(function(res){ (res&&res.error)?toast("تعذّر التحديث","err"):toast("تم تحديث الحالة","ok"); });
   }
 
   daysGrid.addEventListener("click",function(e){
     var cell=e.target.closest(".day");if(!cell)return;
     var key=cell.getAttribute("data-date");if(!key)return;
-    var act=cell.getAttribute("data-act");
-    if(act==="request") openRequest(key);
-    else if(act==="manage"){ isAdmin?openManage(key):openInfo(key); }
+    var anyFree=cell.getAttribute("data-free")==="1";
+    var anyBooked=cell.getAttribute("data-booked")==="1";
+    if(isAdmin){ if(anyBooked) openManage(key); else openRequest(key); }
+    else { if(anyFree) openRequest(key); else openInfo(key); }
   });
   daysGrid.addEventListener("keydown",function(e){if(e.key!=="Enter"&&e.key!==" ")return;var cell=e.target.closest(".day");if(!cell||!cell.getAttribute("data-date"))return;e.preventDefault();cell.click();});
 
   $("reqList").addEventListener("click",function(e){
     var a=e.target.closest("[data-approve]"),r=e.target.closest("[data-decline]");
     if(a) approve(a.getAttribute("data-approve"));
-    else if(r){var k=r.getAttribute("data-decline");askConfirm("رفض الطلب","سيتم رفض هذا الطلب وإعادة اليوم متاحاً. متابعة؟",function(){decline(k);});}
+    else if(r){var k=r.getAttribute("data-decline");askConfirm("رفض الطلب","سيتم رفض هذا الطلب وإعادة الفترة متاحة. متابعة؟",function(){decline(k);});}
   });
   $("logList").addEventListener("click",function(e){var m=e.target.closest("[data-manage]");if(m)openManage(m.getAttribute("data-manage"));});
 
   $("submitReq").addEventListener("click",submitRequest);
   $("mealSeg").addEventListener("click",function(e){
-    var btn=e.target.closest(".meal-opt"); if(!btn) return;
+    var btn=e.target.closest(".meal-opt"); if(!btn||btn.disabled) return;
     selectedMeal=btn.getAttribute("data-meal");
     document.querySelectorAll("#mealSeg .meal-opt").forEach(function(b){b.classList.toggle("active",b===btn);});
   });
@@ -835,16 +944,16 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
   var detailsChannel = null;
 
   function loadDays(){
-    sb.from("days").select("date,status").then(function(res){
+    sb.from("days").select("date,meal,status").then(function(res){
       dayMap={};
-      if(!res.error && res.data) res.data.forEach(function(r){ dayMap[r.date]={status:r.status}; });
+      if(!res.error && res.data) res.data.forEach(function(r){ dayMap[ck(r.date,r.meal)]={date:r.date,meal:r.meal,status:r.status}; });
       rebuildBookings(); renderAll();
     });
   }
   function loadDetails(){
-    sb.from("details").select("date,name,phone,count,note,meal").then(function(res){
+    sb.from("details").select("date,meal,name,phone,count,note").then(function(res){
       detailMap={};
-      if(!res.error && res.data) res.data.forEach(function(r){ detailMap[r.date]={name:r.name,phone:r.phone,count:r.count,note:r.note,meal:r.meal}; });
+      if(!res.error && res.data) res.data.forEach(function(r){ detailMap[ck(r.date,r.meal)]={date:r.date,meal:r.meal,name:r.name,phone:r.phone,count:r.count,note:r.note}; });
       rebuildBookings(); renderAll();
     });
   }
