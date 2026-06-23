@@ -880,9 +880,18 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
   }
   function decline(ckey){
     if(!sb)return; var p=parseCk(ckey);
-    sb.from("details").delete().eq("date",p.date).eq("meal",p.meal)
-      .then(function(){ return sb.from("days").delete().eq("date",p.date).eq("meal",p.meal); })
-      .then(function(res){ (res&&res.error)?toast("تعذّر التحديث","err"):toast("تم تحديث الحالة","ok"); });
+    sb.from("details").delete().eq("date",p.date).eq("meal",p.meal).select()
+      .then(function(){ return sb.from("days").delete().eq("date",p.date).eq("meal",p.meal).select(); })
+      .then(function(res){
+        if(res && res.error){ toast("تعذّر الإلغاء: "+res.error.message,"err"); return; }
+        if(!res || !res.data || res.data.length===0){
+          toast("لم يُحذف الحجز — تأكد من إضافة سياسة DELETE في Supabase","err"); return;
+        }
+        delete dayMap[ckey]; delete detailMap[ckey];
+        rebuildBookings(); renderAll();
+        toast("تم إلغاء الحجز ✓","ok");
+      })
+      .catch(function(e){ toast("تعذّر الإلغاء: "+((e&&e.message)||"خلل بالاتصال"),"err"); });
   }
 
   daysGrid.addEventListener("click",function(e){
