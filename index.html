@@ -534,9 +534,9 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
 
   function rebuildBookings(){
     bookings={};
-    for(var k in dayMap){ var dd=dayMap[k]; bookings[k]={date:dd.date, meal:dd.meal, status:(dd.status||"pending")}; }
+    for(var k in dayMap){ var dd=dayMap[k]; bookings[k]={id:dd.id, date:dd.date, meal:dd.meal, status:(dd.status||"pending")}; }
     for(var j in detailMap){ if(bookings[j]){ var dt=detailMap[j];
-      bookings[j].name=dt.name; bookings[j].phone=dt.phone; bookings[j].count=dt.count; bookings[j].note=dt.note; } }
+      bookings[j].detailId=dt.id; bookings[j].name=dt.name; bookings[j].phone=dt.phone; bookings[j].count=dt.count; bookings[j].note=dt.note; } }
   }
   function slotsTaken(dateKey){
     var t={lunch:false,dinner:false};
@@ -874,14 +874,24 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
       .then(function(){ sub.disabled=false; });
   }
   function approve(ckey){
-    if(!sb)return; var p=parseCk(ckey);
-    sb.from("days").update({status:"confirmed"}).eq("date",p.date).eq("meal",p.meal)
-      .then(function(res){ res.error?toast("تعذّر الاعتماد","err"):toast("تم اعتماد الحجز ✓","ok"); });
+    if(!sb)return;
+    var b=bookings[ckey], p=parseCk(ckey);
+    var q=sb.from("days").update({status:"confirmed"});
+    q = (b && b.id!=null) ? q.eq("id",b.id) : q.eq("date",p.date).eq("meal",p.meal);
+    q.then(function(res){ res.error?toast("تعذّر الاعتماد","err"):toast("تم اعتماد الحجز ✓","ok"); });
   }
   function decline(ckey){
-    if(!sb)return; var p=parseCk(ckey);
-    sb.from("details").delete().eq("date",p.date).eq("meal",p.meal).select()
-      .then(function(){ return sb.from("days").delete().eq("date",p.date).eq("meal",p.meal).select(); })
+    if(!sb)return;
+    var b=bookings[ckey], p=parseCk(ckey);
+    var delDetails = (b && b.detailId!=null)
+      ? sb.from("details").delete().eq("id",b.detailId).select()
+      : sb.from("details").delete().eq("date",p.date).eq("meal",p.meal).select();
+    delDetails
+      .then(function(){
+        return (b && b.id!=null)
+          ? sb.from("days").delete().eq("id",b.id).select()
+          : sb.from("days").delete().eq("date",p.date).eq("meal",p.meal).select();
+      })
       .then(function(res){
         if(res && res.error){ toast("تعذّر الإلغاء: "+res.error.message,"err"); return; }
         if(!res || !res.data || res.data.length===0){
@@ -953,16 +963,16 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
   var detailsChannel = null;
 
   function loadDays(){
-    sb.from("days").select("date,meal,status").then(function(res){
+    sb.from("days").select("id,date,meal,status").then(function(res){
       dayMap={};
-      if(!res.error && res.data) res.data.forEach(function(r){ dayMap[ck(r.date,r.meal)]={date:r.date,meal:r.meal,status:r.status}; });
+      if(!res.error && res.data) res.data.forEach(function(r){ dayMap[ck(r.date,r.meal)]={id:r.id,date:r.date,meal:r.meal,status:r.status}; });
       rebuildBookings(); renderAll();
     });
   }
   function loadDetails(){
-    sb.from("details").select("date,meal,name,phone,count,note").then(function(res){
+    sb.from("details").select("id,date,meal,name,phone,count,note").then(function(res){
       detailMap={};
-      if(!res.error && res.data) res.data.forEach(function(r){ detailMap[ck(r.date,r.meal)]={date:r.date,meal:r.meal,name:r.name,phone:r.phone,count:r.count,note:r.note}; });
+      if(!res.error && res.data) res.data.forEach(function(r){ detailMap[ck(r.date,r.meal)]={id:r.id,date:r.date,meal:r.meal,name:r.name,phone:r.phone,count:r.count,note:r.note}; });
       rebuildBookings(); renderAll();
     });
   }
