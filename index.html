@@ -67,6 +67,12 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:24px;margin-bottom:26px}
 .panel.admin-only{display:none;border:2px solid var(--gold)}
 .panel.admin-only.on{display:block}
+.code-note{font-size:14.5px;color:var(--muted);line-height:1.7;margin:0 0 14px}
+.code-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.code-row .field{flex:1;min-width:180px;margin:0}
+.code-row .btn{flex:0 0 auto;min-width:130px}
+.code-current{margin-top:12px;font-size:14.5px;color:var(--ink)}
+.code-current b{color:var(--gold);font-size:17px;letter-spacing:1px}
 .panel-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:18px}
 .panel-head h2{margin:0;font-size:24px;font-weight:800;color:var(--navy);display:flex;align-items:center;gap:10px}
 .panel-head h2 .bar{width:6px;height:26px;border-radius:3px;background:var(--gold)}
@@ -313,6 +319,21 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
     <div class="req-list" id="reqList"></div>
   </div>
 
+  <div class="panel admin-only" id="codePanel">
+    <div class="panel-head">
+      <h2><span class="bar"></span>رمز الدخول للحجز</h2>
+    </div>
+    <p class="code-note">هذا الرمز يُطلب من الأعضاء عند الضغط على يوم متاح للحجز. يمكنك تغييره متى شئت، وسيُطبَّق فوراً على جميع الأجهزة.</p>
+    <div class="code-row">
+      <div class="field">
+        <label for="adminCodeInput">الرمز الجديد</label>
+        <input type="text" id="adminCodeInput" autocomplete="off" placeholder="اكتب الرمز الجديد">
+      </div>
+      <button class="btn btn-primary" id="saveCodeBtn">حفظ الرمز</button>
+    </div>
+    <div class="code-current" id="codeCurrent"></div>
+  </div>
+
   <div class="panel">
     <div class="panel-head">
       <h2><span class="bar"></span>تقويم الحجوزات</h2>
@@ -490,9 +511,10 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
   "use strict";
 
   var ADMIN_EMAIL   = "admin@majlis.app";
-  // رمز الحجز للأعضاء — يُطلب من العميل عند الضغط على يوم متاح للحجز.
-  // غيّره إلى الرمز الذي تريد توزيعه على الأعضاء فقط.
+  // رمز الحجز الافتراضي — يُستخدم فقط إذا لم يُحفظ رمز في قاعدة البيانات بعد.
+  // الرمز الفعلي يتحكّم به المسؤول من داخل التطبيق (لوحة "رمز الدخول للحجز").
   var BOOKING_CODE  = "1234";
+  var currentBookingCode = BOOKING_CODE;
   var SUPABASE_URL  = "https://dztsmwvlnlntoukmflao.supabase.co";
   var SUPABASE_ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6dHNtd3ZsbmxudG91a21mbGFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2Nzk0ODYsImV4cCI6MjA5NzI1NTQ4Nn0.HgGVL2BIEF0UprG8O2-dl-DnhZE7n8YOzjKuiY7FAaA";
   var sb = null;
@@ -751,11 +773,33 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
 
   function applyAdminUI(){
     $("inboxPanel").classList.toggle("on",isAdmin);
+    $("codePanel").classList.toggle("on",isAdmin);
     $("adminBar").classList.toggle("on",isAdmin);
     var ic=$("adminToggle");
     ic.classList.toggle("is-admin",isAdmin);
     ic.setAttribute("title", isAdmin? "وضع المسؤول مُفعّل" : "دخول المسؤول");
     ic.setAttribute("aria-label", isAdmin? "وضع المسؤول مُفعّل" : "دخول المسؤول");
+    if(isAdmin) refreshCodePanel();
+  }
+
+  function refreshCodePanel(){
+    var cur=$("codeCurrent"); if(cur) cur.innerHTML='الرمز الحالي: <b>'+escapeHtml(currentBookingCode)+'</b>';
+    var inp=$("adminCodeInput"); if(inp && !inp.value) inp.value=currentBookingCode;
+  }
+
+  function saveBookingCode(){
+    var inp=$("adminCodeInput"); if(!inp) return;
+    var code=inp.value.trim();
+    if(!code){ toast("اكتب رمزاً صالحاً","err"); inp.focus(); return; }
+    if(!sb){ toast("لا يوجد اتصال بالخادم","err"); return; }
+    var btn=$("saveCodeBtn"); if(btn) btn.disabled=true;
+    sb.from("settings").upsert({key:"booking_code", value:code}).then(function(res){
+      if(btn) btn.disabled=false;
+      if(res.error){ toast("تعذّر حفظ الرمز","err"); return; }
+      currentBookingCode=code;
+      refreshCodePanel();
+      toast("تم حفظ رمز الحجز","ok");
+    });
   }
 
   function open(id){$(id).classList.add("show");}
@@ -793,7 +837,7 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
   }
   function doUnlock(){
     var code=$("lockCode").value.trim();
-    if(code===BOOKING_CODE){
+    if(code===currentBookingCode){
       bookingUnlocked=true;
       close("lockOverlay");
       if(lockTargetDate) openRequest(lockTargetDate);
@@ -1025,9 +1069,22 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
       .subscribe();
   }
 
+  function loadSettings(){
+    sb.from("settings").select("key,value").eq("key","booking_code").then(function(res){
+      if(!res.error && res.data && res.data.length && res.data[0].value){ currentBookingCode=res.data[0].value; }
+      if(isAdmin) refreshCodePanel();
+    });
+  }
+
+  $("saveCodeBtn").addEventListener("click",saveBookingCode);
+  $("adminCodeInput").addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault();saveBookingCode();}});
+
   sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
   sb.channel("days-changes")
     .on("postgres_changes",{event:"*",schema:"public",table:"days"},function(){ loadDays(); })
+    .subscribe();
+  sb.channel("settings-changes")
+    .on("postgres_changes",{event:"*",schema:"public",table:"settings"},function(){ loadSettings(); })
     .subscribe();
   sb.auth.onAuthStateChange(function(_evt, session){
     isAdmin = !!(session && session.user && session.user.email===ADMIN_EMAIL);
@@ -1035,6 +1092,7 @@ header::after{content:"";position:absolute;inset:0;z-index:0;background:radial-g
     if(isAdmin){ loadDetails(); ensureDetailsChannel(); } else { clearDetails(); }
   });
   loadDays();
+  loadSettings();
 })();
 </script>
 </body>
